@@ -7,16 +7,11 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Stack;
+import java.util.*;
 
 import org.apache.avro.AvroTypeException;
 import org.apache.avro.Schema;
 import org.apache.avro.Schema.Field;
-import org.apache.avro.Schema.Type;
 import org.apache.avro.io.Decoder;
 import org.apache.avro.io.DecoderFactory;
 import org.apache.avro.io.ParsingDecoder;
@@ -24,6 +19,7 @@ import org.apache.avro.io.parsing.JsonGrammarGenerator;
 import org.apache.avro.io.parsing.Parser;
 import org.apache.avro.io.parsing.Symbol;
 import org.apache.avro.util.Utf8;
+import org.apache.avro.util.internal.JacksonUtils;
 import org.codehaus.jackson.Base64Variant;
 import org.codehaus.jackson.JsonFactory;
 import org.codehaus.jackson.JsonLocation;
@@ -141,7 +137,7 @@ public class JsonOptionalDecoder extends ParsingDecoder implements Parser.Action
         if (in.getCurrentToken() == JsonToken.VALUE_NULL) {
             in.nextToken();
         } else {
-            throw error("null");
+            throw getErrorTypeMismatch("null");
         }
     }
 
@@ -153,7 +149,7 @@ public class JsonOptionalDecoder extends ParsingDecoder implements Parser.Action
             in.nextToken();
             return t == JsonToken.VALUE_TRUE;
         } else {
-            throw error("boolean");
+            throw getErrorTypeMismatch("boolean");
         }
     }
 
@@ -165,7 +161,7 @@ public class JsonOptionalDecoder extends ParsingDecoder implements Parser.Action
             in.nextToken();
             return result;
         } else {
-            throw error("int");
+            throw getErrorTypeMismatch("int");
         }
     }
 
@@ -177,7 +173,7 @@ public class JsonOptionalDecoder extends ParsingDecoder implements Parser.Action
             in.nextToken();
             return result;
         } else {
-            throw error("long");
+            throw getErrorTypeMismatch("long");
         }
     }
 
@@ -189,7 +185,7 @@ public class JsonOptionalDecoder extends ParsingDecoder implements Parser.Action
             in.nextToken();
             return result;
         } else {
-            throw error("float");
+            throw getErrorTypeMismatch("float");
         }
     }
 
@@ -201,7 +197,7 @@ public class JsonOptionalDecoder extends ParsingDecoder implements Parser.Action
             in.nextToken();
             return result;
         } else {
-            throw error("double");
+            throw getErrorTypeMismatch("double");
         }
     }
 
@@ -229,12 +225,10 @@ public class JsonOptionalDecoder extends ParsingDecoder implements Parser.Action
         if (parser.topSymbol() == Symbol.MAP_KEY_MARKER) {
             parser.advance(Symbol.MAP_KEY_MARKER);
             if (in.getCurrentToken() != JsonToken.FIELD_NAME) {
-                throw error("map-key");
+                throw getErrorTypeMismatch("map-key");
             }
-        } else {
-            if (in.getCurrentToken() != JsonToken.VALUE_STRING) {
-                throw error("string");
-            }
+        } else if (in.getCurrentToken() != JsonToken.VALUE_STRING) {
+            throw getErrorTypeMismatch("string");
         }
     }
 
@@ -246,7 +240,7 @@ public class JsonOptionalDecoder extends ParsingDecoder implements Parser.Action
             in.nextToken();
             return ByteBuffer.wrap(result);
         } else {
-            throw error("bytes");
+            throw getErrorTypeMismatch("bytes");
         }
     }
 
@@ -260,7 +254,7 @@ public class JsonOptionalDecoder extends ParsingDecoder implements Parser.Action
         if (in.getCurrentToken() == JsonToken.VALUE_STRING) {
             in.nextToken();
         } else {
-            throw error("bytes");
+            throw getErrorTypeMismatch("bytes");
         }
     }
 
@@ -268,9 +262,8 @@ public class JsonOptionalDecoder extends ParsingDecoder implements Parser.Action
         advance(Symbol.FIXED);
         Symbol.IntCheckAction top = (Symbol.IntCheckAction) parser.popSymbol();
         if (size != top.size) {
-            throw new AvroTypeException(
-                    "Incorrect length for fixed binary: expected " +
-                            top.size + " but received " + size + " bytes.");
+            throw new AvroTypeException("Incorrect length for fixed binary: expected " +
+                    top.size + " but received " + size + " bytes.");
         }
     }
 
@@ -280,13 +273,12 @@ public class JsonOptionalDecoder extends ParsingDecoder implements Parser.Action
         if (in.getCurrentToken() == JsonToken.VALUE_STRING) {
             byte[] result = readByteArray();
             in.nextToken();
-            if (result.length != len) {
-                throw new AvroTypeException("Expected fixed length " + len
-                        + ", but got" + result.length);
-            }
+            if (result.length != len)
+                throw new AvroTypeException("Expected fixed length " + len + ", but got" + result.length);
+
             System.arraycopy(result, 0, bytes, start, len);
         } else {
-            throw error("fixed");
+            throw getErrorTypeMismatch("fixed");
         }
     }
 
@@ -300,12 +292,10 @@ public class JsonOptionalDecoder extends ParsingDecoder implements Parser.Action
         if (in.getCurrentToken() == JsonToken.VALUE_STRING) {
             byte[] result = readByteArray();
             in.nextToken();
-            if (result.length != length) {
-                throw new AvroTypeException("Expected fixed length " + length
-                        + ", but got" + result.length);
-            }
+            if (result.length != length)
+                throw new AvroTypeException("Expected fixed length " + length + ", but got" + result.length);
         } else {
-            throw error("fixed");
+            throw getErrorTypeMismatch("fixed");
         }
     }
 
@@ -329,7 +319,7 @@ public class JsonOptionalDecoder extends ParsingDecoder implements Parser.Action
             }
             throw new AvroTypeException("Unknown symbol in enum " + in.getText());
         } else {
-            throw error("fixed");
+            throw getErrorTypeMismatch("fixed");
         }
     }
 
@@ -340,7 +330,7 @@ public class JsonOptionalDecoder extends ParsingDecoder implements Parser.Action
             in.nextToken();
             return doArrayNext();
         } else {
-            throw error("array-start");
+            throw getErrorTypeMismatch("array-start");
         }
     }
 
@@ -368,7 +358,7 @@ public class JsonOptionalDecoder extends ParsingDecoder implements Parser.Action
             in.nextToken();
             advance(Symbol.ARRAY_END);
         } else {
-            throw error("array-start");
+            throw getErrorTypeMismatch("array-start");
         }
         return 0;
     }
@@ -380,7 +370,7 @@ public class JsonOptionalDecoder extends ParsingDecoder implements Parser.Action
             in.nextToken();
             return doMapNext();
         } else {
-            throw error("map-start");
+            throw getErrorTypeMismatch("map-start");
         }
     }
 
@@ -408,7 +398,7 @@ public class JsonOptionalDecoder extends ParsingDecoder implements Parser.Action
             in.nextToken();
             advance(Symbol.MAP_END);
         } else {
-            throw error("map-start");
+            throw getErrorTypeMismatch("map-start");
         }
         return 0;
     }
@@ -416,10 +406,11 @@ public class JsonOptionalDecoder extends ParsingDecoder implements Parser.Action
     @Override
     public int readIndex() throws IOException {
         advance(Symbol.UNION);
-        Symbol.Alternative a = (Symbol.Alternative) parser.popSymbol();
+        final Symbol.Alternative a = (Symbol.Alternative) parser.popSymbol();
 
         String label;
         final JsonToken currentToken = in.getCurrentToken();
+
         if (currentToken == JsonToken.VALUE_NULL) {
             label = "null";
         } else if (currentToken == JsonToken.START_OBJECT
@@ -431,12 +422,13 @@ public class JsonOptionalDecoder extends ParsingDecoder implements Parser.Action
                 ("null".equals(a.getLabel(0)) || "null".equals(a.getLabel(1)))) {
             label = ("null".equals(a.getLabel(0)) ? a.getLabel(1) : a.getLabel(0));
         } else {
-            throw error("start-union");
+            throw getErrorTypeMismatch("start-union");
         }
+
         int n = a.findLabel(label);
-        if (n < 0) {
+        if (n < 0)
             throw new AvroTypeException("Unknown union branch " + label);
-        }
+
         parser.pushSymbol(a.getSymbol(n));
         return n;
     }
@@ -463,9 +455,9 @@ public class JsonOptionalDecoder extends ParsingDecoder implements Parser.Action
                     if (name.equals(fn)) {
                         return null;
                     } else {
-                        if (currentReorderBuffer == null) {
+                        if (currentReorderBuffer == null)
                             currentReorderBuffer = new ReorderBuffer();
-                        }
+
                         currentReorderBuffer.savedFields.put(fn, getValueAsTree(in));
                     }
                 } while (in.getCurrentToken() == JsonToken.FIELD_NAME);
@@ -483,19 +475,19 @@ public class JsonOptionalDecoder extends ParsingDecoder implements Parser.Action
                 reorderBuffers.push(currentReorderBuffer);
                 currentReorderBuffer = null;
             } else {
-                throw error("record-start");
+                throw getErrorTypeMismatch("record-start");
             }
         } else if (top == Symbol.RECORD_END || top == Symbol.UNION_END) {
             if (in.getCurrentToken() == JsonToken.END_OBJECT) {
                 in.nextToken();
                 if (top == Symbol.RECORD_END) {
                     if (currentReorderBuffer != null && !currentReorderBuffer.savedFields.isEmpty()) {
-                        throw error("Unknown fields: " + currentReorderBuffer.savedFields.keySet());
+                        throw getErrorTypeMismatch("Unknown fields: " + currentReorderBuffer.savedFields.keySet());
                     }
                     currentReorderBuffer = reorderBuffers.pop();
                 }
             } else {
-                throw error(top == Symbol.RECORD_END ? "record-end" : "union-end");
+                throw getErrorTypeMismatch(top == Symbol.RECORD_END ? "record-end" : "union-end");
             }
         } else {
             throw new AvroTypeException("Unknown action symbol " + top);
@@ -692,64 +684,61 @@ public class JsonOptionalDecoder extends ParsingDecoder implements Parser.Action
         };
     }
 
-    private AvroTypeException error(String type) {
+    private AvroTypeException getErrorTypeMismatch(String type) {
         return new AvroTypeException("Expected " + type + ". Got " + in.getCurrentToken());
     }
 
     private static final JsonElement NULL_JSON_ELEMENT = new JsonElement(null);
 
     private void injectDefaultValueIfAvailable(final JsonParser in, String fieldName) throws IOException {
-        Field field = findField(schema, fieldName);
-
-        if (field == null) {
+        final Field field = findField(schema, fieldName);
+        if (field == null)
             throw new AvroTypeException("Expected field name not found: " + fieldName);
-        }
 
-        Object defVal = field.defaultVal();
-        if (!(defVal instanceof JsonNode)) {
+        final JsonNode defVal = JacksonUtils.toJsonNode(field.defaultVal());
+        if (defVal == null)
             throw new AvroTypeException("Expected field name not found: " + fieldName);
-        }
 
-        List<JsonElement> result = new ArrayList<>(2);
-        JsonParser traverse = ((JsonNode) defVal).traverse();
+        final List<JsonElement> result = new ArrayList<>(2);
+        final JsonParser traverse = defVal.traverse();
         JsonToken nextToken;
         while ((nextToken = traverse.nextToken()) != null) {
-            if (nextToken.isScalarValue()) {
-                result.add(new JsonElement(nextToken, traverse.getText()));
-            } else {
-                result.add(new JsonElement(nextToken));
-            }
+            final JsonElement element = nextToken.isScalarValue()
+                    ? new JsonElement(nextToken, traverse.getText())
+                    : new JsonElement(nextToken);
+
+            result.add(element);
         }
+
         result.add(NULL_JSON_ELEMENT);
-        if (currentReorderBuffer == null) {
+        if (currentReorderBuffer == null)
             currentReorderBuffer = new ReorderBuffer();
-        }
+
         currentReorderBuffer.origParser = in;
         this.in = makeParser(result);
     }
 
     private static Field findField(Schema schema, String name) {
-        if (schema.getField(name) != null) {
+        if (schema.getField(name) != null)
             return schema.getField(name);
-        }
 
-        Field foundField = null;
-
-        for (Field field : schema.getFields()) {
-            Schema fieldSchema = field.schema();
-            if (Type.RECORD.equals(fieldSchema.getType())) {
-                foundField = findField(fieldSchema, name);
-            } else if (Type.ARRAY.equals(fieldSchema.getType())) {
-                foundField = findField(fieldSchema.getElementType(), name);
-            } else if (Type.MAP.equals(fieldSchema.getType())) {
-                foundField = findField(fieldSchema.getValueType(), name);
-            }
-
-            if (foundField != null) {
-                return foundField;
-            }
-        }
-
-        return foundField;
+        return schema.getFields().stream()
+                .map(Field::schema)
+                .filter(s -> s.getType() != null)
+                .map(s -> {
+                    switch (s.getType()) {
+                        case RECORD:
+                            return findField(s, name);
+                        case ARRAY:
+                            return findField(s.getElementType(), name);
+                        case MAP:
+                            return findField(s.getValueType(), name);
+                        default:
+                            return null;
+                    }
+                })
+                .filter(Objects::nonNull)
+                .findAny()
+                .orElse(null);
     }
 }
