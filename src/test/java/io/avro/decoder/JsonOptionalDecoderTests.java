@@ -47,9 +47,12 @@ public class JsonOptionalDecoderTests extends Assertions {
         }
     }
 
-    // Ensure that even if the order of fields in JSON is different from the order
-    // in schema,
-    // it works.
+    /**
+     * Ensure that even if the order of fields in JSON is different from the order
+     * in schema, it works.
+     * 
+     * @throws Exception if occurred
+     */
     @Test
     public void testReorderFields() throws Exception {
         String w = "{\"type\":\"record\",\"name\":\"R\",\"fields\":"

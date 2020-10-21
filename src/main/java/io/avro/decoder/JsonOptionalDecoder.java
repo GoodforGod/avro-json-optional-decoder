@@ -3,8 +3,6 @@ package io.avro.decoder;
 import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
@@ -20,14 +18,10 @@ import org.apache.avro.io.parsing.Parser;
 import org.apache.avro.io.parsing.Symbol;
 import org.apache.avro.util.Utf8;
 import org.apache.avro.util.internal.JacksonUtils;
-import org.codehaus.jackson.Base64Variant;
 import org.codehaus.jackson.JsonFactory;
-import org.codehaus.jackson.JsonLocation;
 import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.JsonParser;
-import org.codehaus.jackson.JsonStreamContext;
 import org.codehaus.jackson.JsonToken;
-import org.codehaus.jackson.ObjectCodec;
 
 /**
  * A {@link Decoder} for Avro's JSON data encoding.
@@ -45,8 +39,9 @@ public class JsonOptionalDecoder extends ParsingDecoder implements Parser.Action
 
     private static final JsonFactory JSON_FACTORY = new JsonFactory();
 
-    private JsonParser in;
     private final Stack<ReorderBuffer> reorderBuffers = new Stack<>();
+
+    private JsonParser in;
     private ReorderBuffer currentReorderBuffer;
 
     private final Schema schema;
@@ -86,7 +81,7 @@ public class JsonOptionalDecoder extends ParsingDecoder implements Parser.Action
      * Otherwise, this JsonDecoder will reset its state and then reconfigure its
      * input.
      * 
-     * @param in The IntputStream to read from. Cannot be null.
+     * @param in The InputStream to read from. Cannot be null.
      * @return this JsonDecoder
      */
     public JsonOptionalDecoder configure(InputStream in) throws IOException {
@@ -464,11 +459,9 @@ public class JsonOptionalDecoder extends ParsingDecoder implements Parser.Action
             }
 
             injectDefaultValueIfAvailable(in, fa.fname);
-        } else if (top == Symbol.FIELD_END) {
-            if (currentReorderBuffer != null && currentReorderBuffer.origParser != null) {
-                in = currentReorderBuffer.origParser;
-                currentReorderBuffer.origParser = null;
-            }
+        } else if (top == Symbol.FIELD_END && currentReorderBuffer != null && currentReorderBuffer.origParser != null) {
+            in = currentReorderBuffer.origParser;
+            currentReorderBuffer.origParser = null;
         } else if (top == Symbol.RECORD_START) {
             if (in.getCurrentToken() == JsonToken.START_OBJECT) {
                 in.nextToken();
@@ -484,6 +477,7 @@ public class JsonOptionalDecoder extends ParsingDecoder implements Parser.Action
                     if (currentReorderBuffer != null && !currentReorderBuffer.savedFields.isEmpty()) {
                         throw getErrorTypeMismatch("Unknown fields: " + currentReorderBuffer.savedFields.keySet());
                     }
+
                     currentReorderBuffer = reorderBuffers.pop();
                 }
             } else {
@@ -493,21 +487,6 @@ public class JsonOptionalDecoder extends ParsingDecoder implements Parser.Action
             throw new AvroTypeException("Unknown action symbol " + top);
         }
         return null;
-    }
-
-    private static class JsonElement {
-
-        public final JsonToken token;
-        public final String value;
-
-        public JsonElement(JsonToken t, String value) {
-            this.token = t;
-            this.value = value;
-        }
-
-        public JsonElement(JsonToken t) {
-            this(t, null);
-        }
     }
 
     private static List<JsonElement> getValueAsTree(JsonParser in) throws IOException {
@@ -543,145 +522,7 @@ public class JsonOptionalDecoder extends ParsingDecoder implements Parser.Action
     }
 
     private JsonParser makeParser(final List<JsonElement> elements) {
-        return new JsonParser() {
-
-            int pos = 0;
-
-            @Override
-            public ObjectCodec getCodec() {
-                throw new UnsupportedOperationException();
-            }
-
-            @Override
-            public void setCodec(ObjectCodec c) {
-                throw new UnsupportedOperationException();
-            }
-
-            @Override
-            public void close() {
-                throw new UnsupportedOperationException();
-            }
-
-            @Override
-            public JsonToken nextToken() {
-                pos++;
-                return elements.get(pos).token;
-            }
-
-            @Override
-            public JsonParser skipChildren() {
-                JsonToken tkn = elements.get(pos).token;
-                int level = (tkn == JsonToken.START_ARRAY || tkn == JsonToken.END_ARRAY) ? 1 : 0;
-                while (level > 0) {
-                    switch (elements.get(++pos).token) {
-                        case START_ARRAY:
-                        case START_OBJECT:
-                            level++;
-                            break;
-                        case END_ARRAY:
-                        case END_OBJECT:
-                            level--;
-                            break;
-                    }
-                }
-                return this;
-            }
-
-            @Override
-            public boolean isClosed() {
-                throw new UnsupportedOperationException();
-            }
-
-            @Override
-            public String getCurrentName() {
-                throw new UnsupportedOperationException();
-            }
-
-            @Override
-            public JsonStreamContext getParsingContext() {
-                throw new UnsupportedOperationException();
-            }
-
-            @Override
-            public JsonLocation getTokenLocation() {
-                throw new UnsupportedOperationException();
-            }
-
-            @Override
-            public JsonLocation getCurrentLocation() {
-                throw new UnsupportedOperationException();
-            }
-
-            @Override
-            public String getText() {
-                return elements.get(pos).value;
-            }
-
-            @Override
-            public char[] getTextCharacters() {
-                throw new UnsupportedOperationException();
-            }
-
-            @Override
-            public int getTextLength() {
-                throw new UnsupportedOperationException();
-            }
-
-            @Override
-            public int getTextOffset() {
-                throw new UnsupportedOperationException();
-            }
-
-            @Override
-            public Number getNumberValue() {
-                throw new UnsupportedOperationException();
-            }
-
-            @Override
-            public NumberType getNumberType() {
-                throw new UnsupportedOperationException();
-            }
-
-            @Override
-            public int getIntValue() {
-                return Integer.parseInt(getText());
-            }
-
-            @Override
-            public long getLongValue() {
-                return Long.parseLong(getText());
-            }
-
-            @Override
-            public BigInteger getBigIntegerValue() {
-                return new BigInteger(getText());
-            }
-
-            @Override
-            public float getFloatValue() {
-                return Float.parseFloat(getText());
-            }
-
-            @Override
-            public double getDoubleValue() {
-                return Double.parseDouble(getText());
-            }
-
-            @Override
-            public BigDecimal getDecimalValue() {
-                return new BigDecimal(getText());
-            }
-
-            @Override
-            public byte[] getBinaryValue(Base64Variant b64variant) {
-                throw new UnsupportedOperationException();
-            }
-
-            @Override
-            public JsonToken getCurrentToken() {
-                return elements.get(pos).token;
-            }
-        };
+        return new JsonOptionalParser(elements);
     }
 
     private AvroTypeException getErrorTypeMismatch(String type) {
