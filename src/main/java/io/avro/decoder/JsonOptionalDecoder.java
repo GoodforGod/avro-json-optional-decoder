@@ -74,9 +74,9 @@ public class JsonOptionalDecoder extends ParsingDecoder implements Parser.Action
     }
 
     private static Symbol getSymbol(Schema schema) {
-        if (null == schema) {
+        if (null == schema)
             throw new NullPointerException("Schema cannot be null!");
-        }
+
         return new JsonGrammarGenerator().generate(schema);
     }
 
@@ -94,9 +94,9 @@ public class JsonOptionalDecoder extends ParsingDecoder implements Parser.Action
      * @return this JsonDecoder
      */
     public JsonOptionalDecoder configure(InputStream in) throws IOException {
-        if (null == in) {
+        if (null == in)
             throw new NullPointerException("InputStream to read from cannot be null!");
-        }
+
         parser.reset();
         this.in = JSON_FACTORY.createJsonParser(in);
         this.in.nextToken();
@@ -114,13 +114,13 @@ public class JsonOptionalDecoder extends ParsingDecoder implements Parser.Action
      * input.
      * 
      * @param in The String to read from. Cannot be null.
-     * @throws IOException
+     * @throws IOException from json factory
      * @return this JsonDecoder
      */
     public JsonOptionalDecoder configure(String in) throws IOException {
-        if (null == in) {
+        if (null == in)
             throw new NullPointerException("String to read from cannot be null!");
-        }
+
         parser.reset();
         this.in = new JsonFactory().createJsonParser(in);
         this.in.nextToken();
@@ -131,6 +131,7 @@ public class JsonOptionalDecoder extends ParsingDecoder implements Parser.Action
         this.parser.processTrailingImplicitActions();
         if (in.getCurrentToken() == null && this.parser.depth() == 1)
             throw new EOFException();
+
         parser.advance(symbol);
     }
 
@@ -211,17 +212,7 @@ public class JsonOptionalDecoder extends ParsingDecoder implements Parser.Action
 
     @Override
     public String readString() throws IOException {
-        advance(Symbol.STRING);
-        if (parser.topSymbol() == Symbol.MAP_KEY_MARKER) {
-            parser.advance(Symbol.MAP_KEY_MARKER);
-            if (in.getCurrentToken() != JsonToken.FIELD_NAME) {
-                throw error("map-key");
-            }
-        } else {
-            if (in.getCurrentToken() != JsonToken.VALUE_STRING) {
-                throw error("string");
-            }
-        }
+        parseSymbolInAdvance();
         String result = in.getText();
         in.nextToken();
         return result;
@@ -229,6 +220,11 @@ public class JsonOptionalDecoder extends ParsingDecoder implements Parser.Action
 
     @Override
     public void skipString() throws IOException {
+        parseSymbolInAdvance();
+        in.nextToken();
+    }
+
+    private void parseSymbolInAdvance() throws IOException {
         advance(Symbol.STRING);
         if (parser.topSymbol() == Symbol.MAP_KEY_MARKER) {
             parser.advance(Symbol.MAP_KEY_MARKER);
@@ -240,7 +236,6 @@ public class JsonOptionalDecoder extends ParsingDecoder implements Parser.Action
                 throw error("string");
             }
         }
-        in.nextToken();
     }
 
     @Override
@@ -256,8 +251,7 @@ public class JsonOptionalDecoder extends ParsingDecoder implements Parser.Action
     }
 
     private byte[] readByteArray() throws IOException {
-        byte[] result = in.getText().getBytes(StandardCharsets.ISO_8859_1);
-        return result;
+        return in.getText().getBytes(StandardCharsets.ISO_8859_1);
     }
 
     @Override
@@ -461,6 +455,7 @@ public class JsonOptionalDecoder extends ParsingDecoder implements Parser.Action
                     return null;
                 }
             }
+
             if (in.getCurrentToken() == JsonToken.FIELD_NAME) {
                 do {
                     String fn = in.getText();
@@ -474,10 +469,9 @@ public class JsonOptionalDecoder extends ParsingDecoder implements Parser.Action
                         currentReorderBuffer.savedFields.put(fn, getValueAsTree(in));
                     }
                 } while (in.getCurrentToken() == JsonToken.FIELD_NAME);
-                injectDefaultValueIfAvailable(in, fa.fname);
-            } else {
-                injectDefaultValueIfAvailable(in, fa.fname);
             }
+
+            injectDefaultValueIfAvailable(in, fa.fname);
         } else if (top == Symbol.FIELD_END) {
             if (currentReorderBuffer != null && currentReorderBuffer.origParser != null) {
                 in = currentReorderBuffer.origParser;
@@ -711,13 +705,13 @@ public class JsonOptionalDecoder extends ParsingDecoder implements Parser.Action
             throw new AvroTypeException("Expected field name not found: " + fieldName);
         }
 
-        JsonNode defVal = field.defaultValue();
-        if (defVal == null) {
+        Object defVal = field.defaultVal();
+        if (!(defVal instanceof JsonNode)) {
             throw new AvroTypeException("Expected field name not found: " + fieldName);
         }
 
         List<JsonElement> result = new ArrayList<>(2);
-        JsonParser traverse = defVal.traverse();
+        JsonParser traverse = ((JsonNode) defVal).traverse();
         JsonToken nextToken;
         while ((nextToken = traverse.nextToken()) != null) {
             if (nextToken.isScalarValue()) {

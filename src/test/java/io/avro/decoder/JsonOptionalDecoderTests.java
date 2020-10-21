@@ -35,8 +35,8 @@ public class JsonOptionalDecoderTests extends Assertions {
     private void checkNumeric(String type, Object value) throws Exception {
         String def = "{\"type\":\"record\",\"name\":\"X\",\"fields\":"
                 + "[{\"type\":\"" + type + "\",\"name\":\"n\"}]}";
-        Schema schema = Schema.parse(def);
-        DatumReader<GenericRecord> reader = new GenericDatumReader<GenericRecord>(schema);
+        Schema schema = parseSchema(def);
+        DatumReader<GenericRecord> reader = new GenericDatumReader<>(schema);
 
         String[] records = { "{\"n\":1}", "{\"n\":1.0}" };
 
@@ -56,7 +56,7 @@ public class JsonOptionalDecoderTests extends Assertions {
                 + "[{\"type\":\"long\",\"name\":\"l\"},"
                 + "{\"type\":{\"type\":\"array\",\"items\":\"int\"},\"name\":\"a\"}"
                 + "]}";
-        Schema ws = Schema.parse(w);
+        Schema ws = parseSchema(w);
         String data = "{\"a\":[1,2],\"l\":100}{\"l\": 200, \"a\":[1,2]}";
         JsonOptionalDecoder in = new JsonOptionalDecoder(ws, data);
         assertEquals(100, in.readLong());
@@ -157,9 +157,13 @@ public class JsonOptionalDecoderTests extends Assertions {
     }
 
     public GenericRecord readRecord(String schemaString, String jsonData) throws IOException {
-        Schema schema = Schema.parse(schemaString);
+        Schema schema = parseSchema(schemaString);
         Decoder decoder = new JsonOptionalDecoder(schema, jsonData);
-        DatumReader<GenericRecord> datumReader = new GenericDatumReader<GenericRecord>(schema);
+        DatumReader<GenericRecord> datumReader = new GenericDatumReader<>(schema);
         return datumReader.read(null, decoder);
+    }
+
+    private static Schema parseSchema(String schema) {
+        return new Schema.Parser().parse(schema);
     }
 }
