@@ -1,9 +1,9 @@
 # Avro Json Optional Decoder
 
 ![Java CI](https://github.com/GoodforGod/avro-json-optional-decoder/workflows/Java%20CI/badge.svg)
-[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=GoodforGod_avro-json-optional-decoder&metric=alert_status)](https://sonarcloud.io/dashboard?id=GoodforGod_micronaut-arangodb)
-[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=GoodforGod_avro-json-optional-decoder&metric=coverage)](https://sonarcloud.io/dashboard?id=GoodforGod_micronaut-arangodb)
-[![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=GoodforGod_avro-json-optional-decoder&metric=sqale_rating)](https://sonarcloud.io/dashboard?id=GoodforGod_micronaut-arangodb)
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=GoodforGod_avro-json-optional-decoder&metric=alert_status)](https://sonarcloud.io/dashboard?id=GoodforGod_avro-json-optional-decoder)
+[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=GoodforGod_avro-json-optional-decoder&metric=coverage)](https://sonarcloud.io/dashboard?id=GoodforGod_avro-json-optional-decoder)
+[![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=GoodforGod_avro-json-optional-decoder&metric=sqale_rating)](https://sonarcloud.io/dashboard?id=GoodforGod_avro-json-optional-decoder)
 
 Avro Decoder with support optional fields in JSON. [Based on Celos fork.](https://github.com/Celos/avro-json-decoder)
 
