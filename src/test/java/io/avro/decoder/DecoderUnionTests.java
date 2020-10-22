@@ -8,12 +8,10 @@ import org.junit.jupiter.params.provider.MethodSource;
 import java.util.stream.Stream;
 
 /**
- * Description
- *
  * @author Anton Kurako (GoodforGod)
  * @since 22.10.2020
  */
-public class JsonOptionalDecoderUnionTests extends DecoderRunner {
+class DecoderUnionTests extends DecoderRunner {
 
     private static Stream<Arguments> testData() {
         return Stream.of(

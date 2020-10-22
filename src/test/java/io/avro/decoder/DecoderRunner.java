@@ -16,7 +16,7 @@ import java.nio.file.Paths;
  * @author Anton Kurako (GoodforGod)
  * @since 22.10.2020
  */
-public abstract class DecoderRunner extends Assertions {
+abstract class DecoderRunner extends Assertions {
 
     protected GenericRecord readRecord(String schemaString, String jsonData) throws IOException {
         Schema schema = parseSchema(schemaString);
@@ -31,7 +31,7 @@ public abstract class DecoderRunner extends Assertions {
 
     protected static String getAvroSchema(String path) {
         try {
-            final URI uri = JsonOptionalDecoderTests.class.getClassLoader().getResource(path).toURI();
+            final URI uri = DecoderTests.class.getClassLoader().getResource(path).toURI();
             return new String(Files.readAllBytes(Paths.get(uri)));
         } catch (Exception e) {
             throw new IllegalArgumentException(e.getMessage());
