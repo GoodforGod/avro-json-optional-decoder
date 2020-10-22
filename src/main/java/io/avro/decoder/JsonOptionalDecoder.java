@@ -73,10 +73,8 @@ public class JsonOptionalDecoder extends ParsingDecoder implements Parser.Action
 
     /**
      * Reconfigures this JsonDecoder to use the InputStream provided. If the
-     * InputStream provided is null, a NullPointerException is thrown.
-     * </p>
-     * Otherwise, this JsonDecoder will reset its state and then reconfigure its
-     * input.
+     * InputStream provided is null, a NullPointerException is thrown. Otherwise,
+     * this JsonDecoder will reset its state and then reconfigure its input.
      * 
      * @param in The InputStream to read from. Cannot be null.
      * @throws IOException in case of factory parser error
@@ -94,10 +92,8 @@ public class JsonOptionalDecoder extends ParsingDecoder implements Parser.Action
 
     /**
      * Reconfigures this JsonDecoder to use the String provided for input. If the
-     * String provided is null, a NullPointerException is thrown.
-     * </p>
-     * Otherwise, this JsonDecoder will reset its state and then reconfigure its
-     * input.
+     * String provided is null, a NullPointerException is thrown. Otherwise, this
+     * JsonDecoder will reset its state and then reconfigure its input.
      * 
      * @param in The String to read from. Cannot be null.
      * @throws IOException from json factory
