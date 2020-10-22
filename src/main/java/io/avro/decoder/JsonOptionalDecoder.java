@@ -72,16 +72,14 @@ public class JsonOptionalDecoder extends ParsingDecoder implements Parser.Action
     }
 
     /**
-     * <p>
-     * Reconfigures this JsonDecoder to use the InputStream provided.
-     * </p>
-     * <p>
-     * If the InputStream provided is null, a NullPointerException is thrown.
+     * Reconfigures this JsonDecoder to use the InputStream provided. If the
+     * InputStream provided is null, a NullPointerException is thrown.
      * </p>
      * Otherwise, this JsonDecoder will reset its state and then reconfigure its
      * input.
      * 
      * @param in The InputStream to read from. Cannot be null.
+     * @throws IOException in case of factory parser error
      * @return this JsonDecoder
      */
     public JsonOptionalDecoder configure(InputStream in) throws IOException {
@@ -95,11 +93,8 @@ public class JsonOptionalDecoder extends ParsingDecoder implements Parser.Action
     }
 
     /**
-     * <p>
-     * Reconfigures this JsonDecoder to use the String provided for input.
-     * </p>
-     * <p>
-     * If the String provided is null, a NullPointerException is thrown.
+     * Reconfigures this JsonDecoder to use the String provided for input. If the
+     * String provided is null, a NullPointerException is thrown.
      * </p>
      * Otherwise, this JsonDecoder will reset its state and then reconfigure its
      * input.
@@ -459,9 +454,11 @@ public class JsonOptionalDecoder extends ParsingDecoder implements Parser.Action
             }
 
             injectDefaultValueIfAvailable(in, fa.fname);
-        } else if (top == Symbol.FIELD_END && currentReorderBuffer != null && currentReorderBuffer.origParser != null) {
-            in = currentReorderBuffer.origParser;
-            currentReorderBuffer.origParser = null;
+        } else if (top == Symbol.FIELD_END) {
+            if (currentReorderBuffer != null && currentReorderBuffer.origParser != null) {
+                in = currentReorderBuffer.origParser;
+                currentReorderBuffer.origParser = null;
+            }
         } else if (top == Symbol.RECORD_START) {
             if (in.getCurrentToken() == JsonToken.START_OBJECT) {
                 in.nextToken();
