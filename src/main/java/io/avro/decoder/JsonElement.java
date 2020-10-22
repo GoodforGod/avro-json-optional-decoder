@@ -1,6 +1,6 @@
 package io.avro.decoder;
 
-import org.codehaus.jackson.JsonToken;
+import com.fasterxml.jackson.core.JsonToken;
 
 /**
  * Json Avro Element

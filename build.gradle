@@ -44,7 +44,7 @@ configurations {
 }
 
 dependencies {
-    api 'org.apache.avro:avro-compiler:1.8.2'
+    api 'org.apache.avro:avro-compiler:1.9.2'
 
     testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:$jupiterVersion"
     testImplementation "org.junit.jupiter:junit-jupiter-api:$jupiterVersion"

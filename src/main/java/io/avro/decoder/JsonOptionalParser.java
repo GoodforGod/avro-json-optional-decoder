@@ -1,10 +1,12 @@
 package io.avro.decoder;
 
-import org.codehaus.jackson.*;
+import com.fasterxml.jackson.core.*;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Jackson Json Parser
@@ -154,5 +156,85 @@ public class JsonOptionalParser extends JsonParser {
     @Override
     public JsonToken getCurrentToken() {
         return elements.get(pos).token;
+    }
+
+    @Override
+    public Version version() {
+        return null;
+    }
+
+    @Override
+    public JsonToken nextValue() throws IOException {
+        return null;
+    }
+
+    @Override
+    public int getCurrentTokenId() {
+        final JsonToken t = getCurrentToken();
+        return (t == null) ? JsonTokenId.ID_NO_TOKEN : t.id();
+    }
+
+    @Override
+    public boolean hasCurrentToken() {
+        return elements.size() - 1 > pos;
+    }
+
+    @Override
+    public boolean hasTokenId(int id) {
+        final JsonToken t = getCurrentToken();
+        if (t == null)
+            return (JsonTokenId.ID_NO_TOKEN == id);
+
+        return t.id() == id;
+    }
+
+    @Override
+    public boolean hasToken(JsonToken t) {
+        return Objects.equals(getCurrentToken(), t);
+    }
+
+    @Override
+    public void clearCurrentToken() {
+        if (getCurrentToken() != null) {
+            JsonElement element = elements.get(pos);
+            elements.set(pos, new JsonElement(element.token, element.value));
+        }
+    }
+
+    @Override
+    public JsonToken getLastClearedToken() {
+        return elements.get(elements.size() - 1).token;
+    }
+
+    @Override
+    public void overrideCurrentName(String name) {
+
+    }
+
+    @Override
+    public boolean hasTextCharacters() {
+        final JsonToken currentToken = getCurrentToken();
+        if (currentToken == JsonToken.VALUE_STRING)
+            return true;
+        if (currentToken == JsonToken.FIELD_NAME)
+            return !currentToken.isScalarValue();
+        return false;
+    }
+
+    @Override
+    public String getValueAsString(String defaultValue) {
+        final JsonToken currentToken = getCurrentToken();
+        if (currentToken == null || !currentToken.isScalarValue())
+            return defaultValue;
+
+        switch (currentToken) {
+            case FIELD_NAME:
+                return getCurrentName();
+            case VALUE_NULL:
+                return defaultValue;
+            case VALUE_STRING:
+            default:
+                return getText();
+        }
     }
 }
