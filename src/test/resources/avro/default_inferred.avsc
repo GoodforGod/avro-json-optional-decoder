@@ -1,0 +1,11 @@
+{
+  "type": "record",
+  "name": "R",
+  "fields": [
+    {
+      "type": "long",
+      "name": "a",
+      "default": 7
+    }
+  ]
+}

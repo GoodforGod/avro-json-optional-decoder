@@ -1,0 +1,68 @@
+{
+  "type": "record",
+  "name": "wrapper",
+  "fields": [
+    {
+      "name": "data",
+      "type": {
+        "type": "array",
+        "items": {
+          "type": "record",
+          "name": "r1",
+          "fields": [
+            {
+              "name": "r1",
+              "type": {
+                "type": "array",
+                "items": {
+                  "type": "record",
+                  "name": "sr2",
+                  "fields": [
+                    {
+                      "name": "sr2",
+                      "type": "string"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "r2",
+              "type": {
+                "type": "array",
+                "items": {
+                  "type": "record",
+                  "name": "r2",
+                  "fields": [
+                    {
+                      "name": "notfound1",
+                      "type": [
+                        "null",
+                        {
+                          "type": "array",
+                          "items": "string"
+                        }
+                      ],
+                      "default": null
+                    },
+                    {
+                      "name": "notfound2",
+                      "type": [
+                        "null",
+                        {
+                          "type": "array",
+                          "items": "string"
+                        }
+                      ],
+                      "default": null
+                    }
+                  ]
+                }
+              }
+            }
+          ]
+        }
+      }
+    }
+  ]
+}

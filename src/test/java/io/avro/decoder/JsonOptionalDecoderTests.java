@@ -7,10 +7,9 @@ import org.apache.avro.generic.GenericDatumReader;
 import org.apache.avro.generic.GenericRecord;
 import org.apache.avro.io.DatumReader;
 import org.apache.avro.io.Decoder;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-public class JsonOptionalDecoderTests extends Assertions {
+public class JsonOptionalDecoderTests extends DecoderRunner {
 
     @Test
     public void testInt() throws Exception {
@@ -33,8 +32,7 @@ public class JsonOptionalDecoderTests extends Assertions {
     }
 
     private void checkNumeric(String type, Object value) throws Exception {
-        String def = "{\"type\":\"record\",\"name\":\"X\",\"fields\":"
-                + "[{\"type\":\"" + type + "\",\"name\":\"n\"}]}";
+        String def = String.format(getAvroSchema("avro/template.avsc"), type);
         Schema schema = parseSchema(def);
         DatumReader<GenericRecord> reader = new GenericDatumReader<>(schema);
 
@@ -55,10 +53,7 @@ public class JsonOptionalDecoderTests extends Assertions {
      */
     @Test
     public void testReorderFields() throws Exception {
-        String w = "{\"type\":\"record\",\"name\":\"R\",\"fields\":"
-                + "[{\"type\":\"long\",\"name\":\"l\"},"
-                + "{\"type\":{\"type\":\"array\",\"items\":\"int\"},\"name\":\"a\"}"
-                + "]}";
+        String w = getAvroSchema("avro/reorder.avsc");
         Schema ws = parseSchema(w);
         String data = "{\"a\":[1,2],\"l\":100}{\"l\": 200, \"a\":[1,2]}";
         JsonOptionalDecoder in = new JsonOptionalDecoder(ws, data);
@@ -70,7 +65,7 @@ public class JsonOptionalDecoderTests extends Assertions {
 
     @Test
     public void testNullsAreInferred() throws IOException {
-        String w = "{\"type\":\"record\",\"name\":\"R\",\"fields\":[{\"type\":[\"null\",\"long\"],\"name\":\"a\",\"default\":null}]}";
+        String w = getAvroSchema("avro/nullable_union_default.avsc");
         GenericRecord record = readRecord(w, "{}");
 
         assertNull(record.get("a"));
@@ -78,42 +73,42 @@ public class JsonOptionalDecoderTests extends Assertions {
 
     @Test
     public void testUnionNullImplicit() throws IOException {
-        String w = "{\"type\":\"record\",\"name\":\"R\",\"fields\":[{\"type\":[\"null\",\"long\"],\"name\":\"a\",\"default\":null}]}";
+        String w = getAvroSchema("avro/nullable_union_default.avsc");
         GenericRecord record = readRecord(w, "{}");
         assertNull(record.get("a"));
     }
 
     @Test
     public void testUnionNullExplicitUntagged() throws IOException {
-        String w = "{\"type\":\"record\",\"name\":\"R\",\"fields\":[{\"type\":[\"null\",\"long\"],\"name\":\"a\",\"default\":null}]}";
+        String w = getAvroSchema("avro/nullable_union_default.avsc");
         GenericRecord record = readRecord(w, "{\"a\":null}");
         assertNull(record.get("a"));
     }
 
     @Test
     public void testUnionNullExplicitTagged() throws IOException {
-        String w = "{\"type\":\"record\",\"name\":\"R\",\"fields\":[{\"type\":[\"null\",\"long\"],\"name\":\"a\",\"default\":null}]}";
+        String w = getAvroSchema("avro/nullable_union_default.avsc");
         GenericRecord record = readRecord(w, "{\"a\":{\"null\": null}}");
         assertNull(record.get("a"));
     }
 
     @Test
     public void testUnionLongExplicitTagged() throws IOException {
-        String w = "{\"type\":\"record\",\"name\":\"R\",\"fields\":[{\"type\":[\"null\",\"long\"],\"name\":\"a\",\"default\":null}]}";
+        String w = getAvroSchema("avro/nullable_union_default.avsc");
         GenericRecord record = readRecord(w, "{\"a\":{\"long\": 42}}");
         assertEquals(42L, record.get("a"));
     }
 
     @Test
     public void testUnionLongExplicitUntagged() throws IOException {
-        String w = "{\"type\":\"record\",\"name\":\"R\",\"fields\":[{\"type\":[\"null\",\"long\"],\"name\":\"a\",\"default\":null}]}";
+        String w = getAvroSchema("avro/nullable_union_default.avsc");
         GenericRecord record = readRecord(w, "{\"a\":42}");
         assertEquals(42L, record.get("a"));
     }
 
     @Test
     public void testDefaultValuesAreInferred() throws IOException {
-        String w = "{\"type\":\"record\",\"name\":\"R\",\"fields\":[{\"type\":\"long\",\"name\":\"a\",\"default\":7}]}";
+        String w = getAvroSchema("avro/default_inferred.avsc");
         GenericRecord record = readRecord(w, "{}");
 
         assertEquals(7L, record.get("a"));
@@ -121,8 +116,7 @@ public class JsonOptionalDecoderTests extends Assertions {
 
     @Test
     public void testNestedNullsAreInferred() throws IOException {
-        String w = "{\"type\":\"record\",\"name\":\"R\",\"fields\":[{\"name\":\"S\",\"type\":" +
-                "{\"type\":\"record\",\"name\":\"S\",\"fields\":[{\"type\":[\"null\",\"long\"],\"name\":\"a\",\"default\":null},{\"type\":\"long\",\"name\":\"b\"}]}}]}";
+        String w = getAvroSchema("avro/nullable_nested_inferred.avsc");
         String data = "{\"S\": {\"b\":1}}";
         GenericRecord record = ((GenericRecord) readRecord(w, data).get("S"));
         assertNull(record.get("a"));
@@ -130,7 +124,7 @@ public class JsonOptionalDecoderTests extends Assertions {
 
     @Test
     public void testArraysCanBeNull() throws IOException {
-        String w = "{\"type\":\"record\",\"name\":\"R\",\"fields\":[{\"type\":[\"null\",{\"type\":\"array\",\"items\":\"long\"}],\"name\":\"A\",\"default\":null}]}";
+        String w = getAvroSchema("avro/nullable_array.avsc");
         String data = "{}";
         GenericRecord record = readRecord(w, data);
         assertNull(record.get("A"));
@@ -138,35 +132,17 @@ public class JsonOptionalDecoderTests extends Assertions {
 
     @Test
     public void testRecordCanBeNull() throws IOException {
-        String w = "{\"type\":\"record\",\"name\":\"R\",\"namespace\":\"com.playtech.bex.massupdate.api\",\"fields\":" +
-                "[{\"name\":\"S\",\"type\":[\"null\",{\"type\":\"record\",\"name\":\"S\",\"fields\":[{\"name\":\"A\",\"type\":\"long\"}]}],\"default\":null}]}";
+        String w = getAvroSchema("avro/nullable_record.avsc");
         String data = "{}";
         GenericRecord record = readRecord(w, data);
         assertNull(record.get("S"));
     }
 
     @Test
-    public void testWtf() throws IOException {
-        String w = "{\"type\":\"record\",\"name\":\"wrapper\",\"fields\":[{\"name\":\"data\",\"type\":" +
-                "{\"type\":\"array\",\"items\":{\"type\":\"record\",\"name\":\"r1\",\"fields\":" +
-                "[{\"name\":\"r1\",\"type\":{\"type\":\"array\",\"items\":{\"type\":\"record\",\"name\":\"sr2\",\"fields\":" +
-                "[{\"name\":\"sr2\",\"type\":\"string\"}]}}},{\"name\":\"r2\",\"type\":{\"type\":\"array\",\"items\":" +
-                "{\"type\":\"record\",\"name\":\"r2\",\"fields\":[{\"name\":\"notfound1\",\"type\":[\"null\"," +
-                "{\"type\":\"array\",\"items\":\"string\"}],\"default\":null},{\"name\":\"notfound2\",\"type\":" +
-                "[\"null\",{\"type\":\"array\",\"items\":\"string\"}],\"default\":null}]}}}]}}}]}";
+    public void testComplex() throws IOException {
+        String w = getAvroSchema("avro/nullable_complex.avsc");
         String data = "{\"data\":[{\"r1\":[],\"r2\":[{\"notfound1\":{\"array\":[\"val1\",\"val2\"]}}]}]}";
         GenericRecord record = readRecord(w, data);
         assertNull(record.get("S"));
-    }
-
-    public GenericRecord readRecord(String schemaString, String jsonData) throws IOException {
-        Schema schema = parseSchema(schemaString);
-        Decoder decoder = new JsonOptionalDecoder(schema, jsonData);
-        DatumReader<GenericRecord> datumReader = new GenericDatumReader<>(schema);
-        return datumReader.read(null, decoder);
-    }
-
-    private static Schema parseSchema(String schema) {
-        return new Schema.Parser().parse(schema);
     }
 }

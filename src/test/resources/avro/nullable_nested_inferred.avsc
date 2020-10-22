@@ -1,0 +1,27 @@
+{
+  "type": "record",
+  "name": "R",
+  "fields": [
+    {
+      "name": "S",
+      "type": {
+        "type": "record",
+        "name": "S",
+        "fields": [
+          {
+            "type": [
+              "null",
+              "long"
+            ],
+            "name": "a",
+            "default": null
+          },
+          {
+            "type": "long",
+            "name": "b"
+          }
+        ]
+      }
+    }
+  ]
+}
