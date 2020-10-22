@@ -39,7 +39,8 @@ For given AVRO Schema.
     "type" : "string"
   }, {
     "name" : "name",
-    "type" : [ "string", "null" ]
+    "type" : [ "string", "null" ],
+    "default": null
   } ]
 }
 ```
