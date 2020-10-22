@@ -1,8 +1,8 @@
 package io.avro.decoder;
 
 import com.fasterxml.jackson.core.*;
+import com.fasterxml.jackson.core.json.PackageVersion;
 
-import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.List;
@@ -160,12 +160,15 @@ public class JsonOptionalParser extends JsonParser {
 
     @Override
     public Version version() {
-        return null;
+        return PackageVersion.VERSION;
     }
 
     @Override
-    public JsonToken nextValue() throws IOException {
-        return null;
+    public JsonToken nextValue() {
+        JsonToken t = nextToken();
+        if (t == JsonToken.FIELD_NAME)
+            t = nextToken();
+        return t;
     }
 
     @Override
@@ -208,7 +211,7 @@ public class JsonOptionalParser extends JsonParser {
 
     @Override
     public void overrideCurrentName(String name) {
-
+        throw new UnsupportedOperationException();
     }
 
     @Override
