@@ -2,6 +2,7 @@ package io.avro.decoder;
 
 import java.io.IOException;
 
+import org.apache.avro.AvroRuntimeException;
 import org.apache.avro.Schema;
 import org.apache.avro.generic.GenericRecord;
 import org.junit.jupiter.api.Test;
@@ -63,6 +64,8 @@ class DecoderTests extends DecoderRunner {
         String w = getAvroSchema("avro/nullable_complex.avsc");
         String data = "{\"data\":[{\"r1\":[],\"r2\":[{\"notfound1\":{\"array\":[\"val1\",\"val2\"]}}]}]}";
         GenericRecord record = readRecord(w, data);
-        assertNull(record.get("S"));
+
+        Throwable exception = assertThrows(AvroRuntimeException.class, () -> record.get("S"));
+        assertEquals(exception.getMessage(), "Not a valid schema field: S");
     }
 }

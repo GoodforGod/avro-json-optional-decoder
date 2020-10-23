@@ -44,7 +44,7 @@ configurations {
 }
 
 dependencies {
-    api 'org.apache.avro:avro-compiler:1.9.2'
+    api 'org.apache.avro:avro-compiler:1.10.0'
 
     testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:$jupiterVersion"
     testImplementation "org.junit.jupiter:junit-jupiter-api:$jupiterVersion"
@@ -86,7 +86,7 @@ publishing {
                 description = 'AVRO Decoder with JSON optional field support.'
 
                 license {
-                    name = 'Apache License 2.0'
+                    name = 'MIT License'
                     url = 'https://github.com/GoodforGod/avro-json-optional-decoder/blob/master/LICENSE'
                     distribution = 'repo'
                 }
