@@ -10,8 +10,6 @@ Avro Decoder with support optional fields in JSON.
 
 ## Dependency
 
-Project is compatible with Apache Avro library [1.8.2](https://mvnrepository.com/artifact/org.apache.avro/avro/1.8.2)
-
 **Gradle**
 ```groovy
 dependencies {
@@ -30,7 +28,9 @@ dependencies {
 
 ## Compatibility
 
-Library is compatible with different Apache Avro versions.
+Library is Java 1.8 compatible.
+
+Library is compatible with different Apache Avro versions. Please use compatible library version for your Apache Avro version.
 
 | [Apache Avro](https://mvnrepository.com/artifact/org.apache.avro/avro-compiler) Version | [Library](https://mvnrepository.com/artifact/com.github.goodforgod/avro-json-optional-decoder) Version |
 | ---- | ---- |
@@ -50,7 +50,8 @@ For given AVRO Schema.
     "type" : "string"
   }, {
     "name" : "name",
-    "type" : [ "string", "null" ]
+    "type" : [ "string", "null" ],
+    "default": null
   } ]
 }
 ```
@@ -72,9 +73,12 @@ org.apache.avro.AvroTypeException: Expected field name not found: name
 
 ### Solution 
 
-**JsonOptionalDecoder** provided by library allow correct JSON validation in both cases.
+**JsonOptionalDecoder** provided by library allow correct JSON validation in both cases,
+decoding JSON that doesn't specify optional values, provided they have defaults.
 
-Decoder allows decoding JSON that doesn't specify optional values, provided they have defaults.
+Check [guides](https://www.baeldung.com/java-apache-avro#2-deserialization) on how-to-use Avro Decoders.
+
+Be aware JsonOptionalDecoder is not thread-safe.
 
 ## How To Use
 
@@ -96,4 +100,4 @@ Decoder decoder = new JsonOptionalDecoder(SCHEMA, INPUT_STREAM_OR_STRING);
 
 ## License
 
-This project licensed under the Apache License 2.0 - see the [LICENSE](LICENSE) file for details.
+This project licensed under the MIT - see the [LICENSE](LICENSE) file for details.

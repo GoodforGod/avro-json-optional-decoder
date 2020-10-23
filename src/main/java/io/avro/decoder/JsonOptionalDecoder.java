@@ -28,7 +28,7 @@ import org.apache.avro.util.internal.JacksonUtils;
  * <p>
  * Construct using {@link DecoderFactory}.
  * </p>
- * ExtendedJsonDecoder is not thread-safe.
+ * JsonOptionalDecoder is not thread-safe.
  * <p>
  * Based on {@link org.apache.avro.io.JsonDecoder JsonDecoder} and
  * <a href="https://github.com/zolyfarkas/avro">ExtendedJsonDecoder</a>. Infers
