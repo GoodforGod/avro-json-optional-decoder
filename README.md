@@ -5,16 +5,15 @@
 [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=GoodforGod_avro-json-optional-decoder&metric=coverage)](https://sonarcloud.io/dashboard?id=GoodforGod_avro-json-optional-decoder)
 [![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=GoodforGod_avro-json-optional-decoder&metric=sqale_rating)](https://sonarcloud.io/dashboard?id=GoodforGod_avro-json-optional-decoder)
 
-Avro Decoder with support optional fields in JSON. [Based on Celos fork.](https://github.com/Celos/avro-json-decoder)
+Avro Decoder with support optional fields in JSON.
+[Based on Celos fork.](https://github.com/Celos/avro-json-decoder)
 
 ## Dependency
-
-Project is compatible with Apache Avro library [1.8.2](https://mvnrepository.com/artifact/org.apache.avro/avro/1.8.2)
 
 **Gradle**
 ```groovy
 dependencies {
-    compile 'com.github.goodforgod:avro-json-optional-decoder:1.0.0'
+    compile 'com.github.goodforgod:avro-json-optional-decoder:1.1.0'
 }
 ```
 
@@ -23,9 +22,21 @@ dependencies {
 <dependency>
     <groupId>com.github.goodforgod</groupId>
     <artifactId>avro-json-optional-decoder</artifactId>
-    <version>1.0.0</version>
+    <version>1.1.0</version>
 </dependency>
 ```
+
+## Compatibility
+
+Library is Java 1.8 compatible.
+
+Library is compatible with different Apache Avro versions. Please use compatible library version for your Apache Avro version.
+
+| [Apache Avro](https://mvnrepository.com/artifact/org.apache.avro/avro-compiler) Version | [Library](https://mvnrepository.com/artifact/com.github.goodforgod/avro-json-optional-decoder) Version |
+| ---- | ---- |
+| [1.9.2](https://mvnrepository.com/artifact/org.apache.avro/avro-compiler/1.9.2) | [1.1.0](https://mvnrepository.com/artifact/com.github.goodforgod/avro-json-optional-decoder/1.1.0) |
+| [1.8.2](https://mvnrepository.com/artifact/org.apache.avro/avro-compiler/1.8.2) | [1.0.0](https://mvnrepository.com/artifact/com.github.goodforgod/avro-json-optional-decoder/1.0.0) |
+
 
 ## Optional Field Problem
 
@@ -62,9 +73,12 @@ org.apache.avro.AvroTypeException: Expected field name not found: name
 
 ### Solution 
 
-**JsonOptionalDecoder** provided by library allow correct JSON validation in both cases.
+**JsonOptionalDecoder** provided by library allow correct JSON validation in both cases,
+decoding JSON that doesn't specify optional values, provided they have defaults.
 
-Decoder allows decoding JSON that doesn't specify optional values, provided they have defaults.
+Check [guides](https://www.baeldung.com/java-apache-avro#2-deserialization) on how-to-use Avro Decoders.
+
+Be aware JsonOptionalDecoder is not thread-safe.
 
 ## How To Use
 
@@ -80,8 +94,10 @@ Decoder decoder = new JsonOptionalDecoder(SCHEMA, INPUT_STREAM_OR_STRING);
 
 ## Version History
 
-**1.0.0** - Initial version for Apache Avro 1.8.2, support for Gradle 6.7, etc.
+**1.1.0** - Apache [Avro 1.9.2](https://mvnrepository.com/artifact/org.apache.avro/avro-compiler/1.9.2) support, improved tests.
+
+**1.0.0** - Initial version for Apache [Avro 1.8.2](https://mvnrepository.com/artifact/org.apache.avro/avro-compiler/1.8.2), support for Gradle 6.7, etc.
 
 ## License
 
-This project licensed under the Apache License 2.0 - see the [LICENSE](LICENSE) file for details.
+This project licensed under the MIT - see the [LICENSE](LICENSE) file for details.

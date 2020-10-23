@@ -7,6 +7,10 @@ import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 
+import com.fasterxml.jackson.core.JsonFactory;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.JsonToken;
+import com.fasterxml.jackson.databind.JsonNode;
 import org.apache.avro.AvroTypeException;
 import org.apache.avro.Schema;
 import org.apache.avro.Schema.Field;
@@ -18,17 +22,13 @@ import org.apache.avro.io.parsing.Parser;
 import org.apache.avro.io.parsing.Symbol;
 import org.apache.avro.util.Utf8;
 import org.apache.avro.util.internal.JacksonUtils;
-import org.codehaus.jackson.JsonFactory;
-import org.codehaus.jackson.JsonNode;
-import org.codehaus.jackson.JsonParser;
-import org.codehaus.jackson.JsonToken;
 
 /**
  * A {@link Decoder} for Avro's JSON data encoding.
  * <p>
  * Construct using {@link DecoderFactory}.
  * </p>
- * ExtendedJsonDecoder is not thread-safe.
+ * JsonOptionalDecoder is not thread-safe.
  * <p>
  * Based on {@link org.apache.avro.io.JsonDecoder JsonDecoder} and
  * <a href="https://github.com/zolyfarkas/avro">ExtendedJsonDecoder</a>. Infers
@@ -85,7 +85,7 @@ public class JsonOptionalDecoder extends ParsingDecoder implements Parser.Action
             throw new NullPointerException("InputStream to read from cannot be null!");
 
         parser.reset();
-        this.in = JSON_FACTORY.createJsonParser(in);
+        this.in = JSON_FACTORY.createParser(in);
         this.in.nextToken();
         return this;
     }
@@ -104,7 +104,7 @@ public class JsonOptionalDecoder extends ParsingDecoder implements Parser.Action
             throw new NullPointerException("String to read from cannot be null!");
 
         parser.reset();
-        this.in = new JsonFactory().createJsonParser(in);
+        this.in = new JsonFactory().createParser(in);
         this.in.nextToken();
         return this;
     }
