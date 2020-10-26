@@ -50,7 +50,7 @@ For given AVRO Schema.
     "type" : "string"
   }, {
     "name" : "name",
-    "type" : [ "string", "null" ],
+    "type" : [ "null", "string" ], // Order matters
     "default": null
   } ]
 }
@@ -79,6 +79,17 @@ decoding JSON that doesn't specify optional values, provided they have defaults.
 Check [guides](https://www.baeldung.com/java-apache-avro#2-deserialization) on how-to-use Avro Decoders.
 
 Be aware JsonOptionalDecoder is not thread-safe.
+
+#### Union Order
+
+**Please check** that your union type have correct order. First *null* then your type.
+```json
+{
+    "name" : "name",
+    "type" : [ "null", "string" ], // Null first, then type
+    "default": null
+}
+```
 
 ## How To Use
 
