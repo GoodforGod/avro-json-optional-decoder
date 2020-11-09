@@ -27,6 +27,22 @@ class DecoderTests extends DecoderRunner {
     }
 
     @Test
+    public void testNullByDefault() throws IOException {
+        String w = getAvroSchema("avro/null_by_default.avsc");
+        GenericRecord record = readRecord(w, "{\"username\":\"bob\"}");
+
+        assertEquals("bob", record.get("username").toString());
+    }
+
+    @Test
+    public void testNullByDefaultAnyPosition() throws IOException {
+        String w = getAvroSchema("avro/null_by_default.avsc");
+        GenericRecord record = readRecord(w, "{\"username\":\"bob\"}");
+
+        assertEquals("bob", record.get("username").toString());
+    }
+
+    @Test
     public void testDefaultValuesAreInferred() throws IOException {
         String w = getAvroSchema("avro/default_inferred.avsc");
         GenericRecord record = readRecord(w, "{}");
