@@ -13,7 +13,7 @@ Avro Decoder with support optional fields in JSON.
 **Gradle**
 ```groovy
 dependencies {
-    compile 'com.github.goodforgod:avro-json-optional-decoder:1.1.0'
+    compile 'com.github.goodforgod:avro-json-optional-decoder:1.1.1'
 }
 ```
 
@@ -22,7 +22,7 @@ dependencies {
 <dependency>
     <groupId>com.github.goodforgod</groupId>
     <artifactId>avro-json-optional-decoder</artifactId>
-    <version>1.1.0</version>
+    <version>1.1.1</version>
 </dependency>
 ```
 
@@ -34,8 +34,8 @@ Library is compatible with different Apache Avro versions. Please use compatible
 
 | [Apache Avro](https://mvnrepository.com/artifact/org.apache.avro/avro-compiler) Version | [Library](https://mvnrepository.com/artifact/com.github.goodforgod/avro-json-optional-decoder) Version |
 | ---- | ---- |
-| [1.9.2](https://mvnrepository.com/artifact/org.apache.avro/avro-compiler/1.9.2) | [1.1.0](https://mvnrepository.com/artifact/com.github.goodforgod/avro-json-optional-decoder/1.1.0) |
-| [1.8.2](https://mvnrepository.com/artifact/org.apache.avro/avro-compiler/1.8.2) | [1.0.0](https://mvnrepository.com/artifact/com.github.goodforgod/avro-json-optional-decoder/1.0.0) |
+| [1.9.2](https://mvnrepository.com/artifact/org.apache.avro/avro-compiler/1.9.2) | [1.1.1](https://mvnrepository.com/artifact/com.github.goodforgod/avro-json-optional-decoder/1.1.0) |
+| [1.8.2](https://mvnrepository.com/artifact/org.apache.avro/avro-compiler/1.8.2) | [1.0.1](https://mvnrepository.com/artifact/com.github.goodforgod/avro-json-optional-decoder/1.0.0) |
 
 
 ## Optional Field Problem
@@ -50,8 +50,7 @@ For given AVRO Schema.
     "type" : "string"
   }, {
     "name" : "name",
-    "type" : [ "null", "string" ], // Order matters
-    "default": null
+    "type" : [ "null", "string" ]
   } ]
 }
 ```
@@ -80,14 +79,25 @@ Check [guides](https://www.baeldung.com/java-apache-avro#2-deserialization) on h
 
 Be aware JsonOptionalDecoder is not thread-safe.
 
-#### Union Order
+#### By Default
 
-**Please check** that your union type have correct order. First *null* then your type.
+If property *default* is not specified, then missing field will be treated as [avro *null*](https://avro.apache.org/docs/1.9.2/spec.html#schema_primitive) value.
+
 ```json
 {
     "name" : "name",
-    "type" : [ "null", "string" ], // Null first, then type
-    "default": null
+    "type" : [ "null", "string" ]
+}
+```
+
+You can specify default value as per AVRO specification.
+
+Keep in mind you *mind putting type corresponding to default value first*, due to AVRO incorrect union type validation.
+```json
+{
+    "name" : "name",
+    "type" : [ "string", "null" ],
+    "default": "bob"
 }
 ```
 
@@ -105,9 +115,17 @@ Decoder decoder = new JsonOptionalDecoder(SCHEMA, INPUT_STREAM_OR_STRING);
 
 ## Version History
 
-**1.1.0** - Apache [Avro 1.9.2](https://mvnrepository.com/artifact/org.apache.avro/avro-compiler/1.9.2) support, improved tests.
+**1.1.1** - [Avro 1.9.2](https://mvnrepository.com/artifact/org.apache.avro/avro-compiler/1.9.2) 
+missing field default value AVRO *null* instead of missing field exception.
 
-**1.0.0** - Initial version for Apache [Avro 1.8.2](https://mvnrepository.com/artifact/org.apache.avro/avro-compiler/1.8.2), support for Gradle 6.7, etc.
+**1.1.0** - Apache [Avro 1.9.2](https://mvnrepository.com/artifact/org.apache.avro/avro-compiler/1.9.2) 
+support, improved tests.
+
+**1.0.1** - [Avro 1.8.2](https://mvnrepository.com/artifact/org.apache.avro/avro-compiler/1.8.2) 
+missing field default value AVRO *null* instead of missing field exception.
+
+**1.0.0** - Initial version for Apache [Avro 1.8.2](https://mvnrepository.com/artifact/org.apache.avro/avro-compiler/1.8.2), 
+support for Gradle 6.7, etc.
 
 ## License
 
