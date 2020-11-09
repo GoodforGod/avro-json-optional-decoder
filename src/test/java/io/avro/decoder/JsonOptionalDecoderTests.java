@@ -69,6 +69,24 @@ public class JsonOptionalDecoderTests extends Assertions {
     }
 
     @Test
+    public void testByDefaultNull() throws IOException {
+        String w = "{\"type\":\"record\",\"name\":\"Person\",\"fields\":[{\"name\":\"username\",\"type\":\"string\"},{\"name\":\"name\",\"type\":[\"string\",\"null\"]}]}";
+        GenericRecord record = readRecord(w, "{\"username\":\"bob\"}");
+
+        assertNotNull(record.get("username"));
+        assertEquals("bob", record.get("username").toString());
+    }
+
+    @Test
+    public void testByDefaultNullInAnyPosition() throws IOException {
+        String w = "{\"type\":\"record\",\"name\":\"Person\",\"fields\":[{\"name\":\"username\",\"type\":\"string\"},{\"name\":\"name\",\"type\":[\"null\",\"string\"]}]}";
+        GenericRecord record = readRecord(w, "{\"username\":\"bob\"}");
+
+        assertNotNull(record.get("username"));
+        assertEquals("bob", record.get("username").toString());
+    }
+
+    @Test
     public void testNullsAreInferred() throws IOException {
         String w = "{\"type\":\"record\",\"name\":\"R\",\"fields\":[{\"type\":[\"null\",\"long\"],\"name\":\"a\",\"default\":null}]}";
         GenericRecord record = readRecord(w, "{}");

@@ -65,6 +65,8 @@ org.apache.avro.AvroTypeException: Expected field name not found: name
 
 Decoder allows decoding JSON that doesn't specify optional values, provided they have defaults.
 
+**By default** missed fields will be treated as *null* value if not specified by *default* property otherwise.
+
 ## How To Use
 
 Change
@@ -78,6 +80,8 @@ Decoder decoder = new JsonOptionalDecoder(SCHEMA, INPUT_STREAM_OR_STRING);
 ```
 
 ## Version History
+
+**1.0.1** - Treat missing field by default as null and not throw missing field excpetion.
 
 **1.0.0** - Initial version for Apache Avro 1.8.2, support for Gradle 6.7, etc.
 
