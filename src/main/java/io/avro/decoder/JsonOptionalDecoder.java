@@ -12,6 +12,7 @@ import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.apache.avro.AvroTypeException;
+import org.apache.avro.JsonProperties;
 import org.apache.avro.Schema;
 import org.apache.avro.Schema.Field;
 import org.apache.avro.io.Decoder;
@@ -529,7 +530,8 @@ public class JsonOptionalDecoder extends ParsingDecoder implements Parser.Action
         if (field == null)
             throw new AvroTypeException("Expected field name not found: " + fieldName);
 
-        final JsonNode defVal = JacksonUtils.toJsonNode(field.defaultVal());
+        final Object defJsonValue = field.defaultVal() == null ? JsonProperties.NULL_VALUE : field.defaultVal();
+        final JsonNode defVal = JacksonUtils.toJsonNode(defJsonValue);
         if (defVal == null)
             throw new AvroTypeException("Expected field name not found: " + fieldName);
 
