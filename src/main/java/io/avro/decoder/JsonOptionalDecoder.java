@@ -400,14 +400,14 @@ public class JsonOptionalDecoder extends ParsingDecoder implements Parser.Action
 
         if (currentToken == JsonToken.VALUE_NULL) {
             label = "null";
+        } else if (a.size() == 2 &&
+                ("null".equals(a.getLabel(0)) || "null".equals(a.getLabel(1)))) {
+            label = ("null".equals(a.getLabel(0)) ? a.getLabel(1) : a.getLabel(0));
         } else if (currentToken == JsonToken.START_OBJECT
                 && in.nextToken() == JsonToken.FIELD_NAME) {
             label = in.getText();
             in.nextToken();
             parser.pushSymbol(Symbol.UNION_END);
-        } else if (a.size() == 2 &&
-                ("null".equals(a.getLabel(0)) || "null".equals(a.getLabel(1)))) {
-            label = ("null".equals(a.getLabel(0)) ? a.getLabel(1) : a.getLabel(0));
         } else {
             throw getErrorTypeMismatch("start-union");
         }
@@ -562,6 +562,14 @@ public class JsonOptionalDecoder extends ParsingDecoder implements Parser.Action
                 .map(Field::schema)
                 .filter(s -> s.getType() != null)
                 .map(s -> {
+                    if (Schema.Type.UNION.equals(s.getType())) {
+                        return s.getTypes().stream()
+                                .filter(sub -> sub.getType().equals(Schema.Type.RECORD))
+                                .map(sub -> findField(sub, name))
+                                .findAny()
+                                .orElse(null);
+                    }
+
                     switch (s.getType()) {
                         case RECORD:
                             return findField(s, name);

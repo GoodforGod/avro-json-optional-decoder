@@ -1,24 +1,35 @@
 {
   "type": "record",
   "name": "R",
-  "namespace": "io.avro.decoder",
   "fields": [
     {
-      "name": "S",
+      "type": "string",
+      "name": "required"
+    },
+    {
+      "type": [ "null", "string" ],
+      "name": "opt",
+      "default": null
+    },
+    {
+      "name": "inner",
       "type": [
         "null",
         {
           "type": "record",
-          "name": "S",
+          "name": "inner",
           "fields": [
             {
-              "name": "A",
-              "type": "long"
+              "name": "req",
+              "type": "string"
+            },
+            {
+              "name": "code",
+              "type": [ "null", "long" ]
             }
           ]
         }
-      ],
-      "default": null
+      ]
     }
   ]
 }

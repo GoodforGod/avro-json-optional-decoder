@@ -13,7 +13,7 @@ Avro Decoder with support optional fields in JSON.
 **Gradle**
 ```groovy
 dependencies {
-    compile 'com.github.goodforgod:avro-json-optional-decoder:1.1.1'
+    compile 'com.github.goodforgod:avro-json-optional-decoder:1.1.2'
 }
 ```
 
@@ -22,7 +22,7 @@ dependencies {
 <dependency>
     <groupId>com.github.goodforgod</groupId>
     <artifactId>avro-json-optional-decoder</artifactId>
-    <version>1.1.1</version>
+    <version>1.1.2</version>
 </dependency>
 ```
 
@@ -34,7 +34,7 @@ Library is compatible with different Apache Avro versions. Please use compatible
 
 | [Apache Avro](https://mvnrepository.com/artifact/org.apache.avro/avro-compiler) Version | [Library](https://mvnrepository.com/artifact/com.github.goodforgod/avro-json-optional-decoder) Version |
 | ---- | ---- |
-| [1.9.2](https://mvnrepository.com/artifact/org.apache.avro/avro-compiler/1.9.2) | [1.1.1](https://mvnrepository.com/artifact/com.github.goodforgod/avro-json-optional-decoder/1.1.0) |
+| [1.9.2](https://mvnrepository.com/artifact/org.apache.avro/avro-compiler/1.9.2) | [1.1.2](https://mvnrepository.com/artifact/com.github.goodforgod/avro-json-optional-decoder/1.1.0) |
 | [1.8.2](https://mvnrepository.com/artifact/org.apache.avro/avro-compiler/1.8.2) | [1.0.1](https://mvnrepository.com/artifact/com.github.goodforgod/avro-json-optional-decoder/1.0.0) |
 
 
@@ -70,7 +70,7 @@ Will fail with:
 org.apache.avro.AvroTypeException: Expected field name not found: name
 ```
 
-### Solution 
+## Solution 
 
 **JsonOptionalDecoder** provided by library allow correct JSON validation in both cases,
 decoding JSON that doesn't specify optional values, provided they have defaults.
@@ -78,6 +78,50 @@ decoding JSON that doesn't specify optional values, provided they have defaults.
 Check [guides](https://www.baeldung.com/java-apache-avro#2-deserialization) on how-to-use Avro Decoders.
 
 Be aware JsonOptionalDecoder is not thread-safe.
+
+### Optional Record Problem
+
+Version 1.1.2+ fixes same issue for records as optional fields.
+
+For given AVRO Schema.
+```json
+{
+  "type": "record",
+  "name": "Test",
+  "fields": [
+    {
+      "type": "string",
+      "name": "required"
+    },
+    {
+      "name": "inner",
+      "type": [
+        "null",
+        {
+          "type": "record",
+          "name": "inner",
+          "fields": [
+            {
+              "name": "req",
+              "type": "string"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
+```
+
+This input will be correct:
+```json
+{"required":"u", "inner": {"req": "q"}}
+```
+
+As this input will be correct:
+```json
+{"required":"u"}
+```
 
 #### By Default
 
@@ -115,8 +159,11 @@ Decoder decoder = new JsonOptionalDecoder(SCHEMA, INPUT_STREAM_OR_STRING);
 
 ## Version History
 
+**1.1.2** - [Avro 1.9.2](https://mvnrepository.com/artifact/org.apache.avro/avro-compiler/1.9.2) 
+missing *record field* default value AVRO *null* instead of missing field exception.
+
 **1.1.1** - [Avro 1.9.2](https://mvnrepository.com/artifact/org.apache.avro/avro-compiler/1.9.2) 
-missing field default value AVRO *null* instead of missing field exception.
+missing *simple field* default value AVRO *null* instead of missing field exception.
 
 **1.1.0** - Apache [Avro 1.9.2](https://mvnrepository.com/artifact/org.apache.avro/avro-compiler/1.9.2) 
 support, improved tests.
