@@ -1,0 +1,24 @@
+{
+  "type": "record",
+  "name": "R",
+  "namespace": "io.avro.decoder",
+  "fields": [
+    {
+      "name": "S",
+      "type": [
+        "null",
+        {
+          "type": "record",
+          "name": "S",
+          "fields": [
+            {
+              "name": "A",
+              "type": "long"
+            }
+          ]
+        }
+      ],
+      "default": null
+    }
+  ]
+}

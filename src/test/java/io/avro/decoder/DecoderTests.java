@@ -61,9 +61,9 @@ class DecoderTests extends DecoderRunner {
     @Test
     public void testNestedNullsAreInferredWhenNotPresent() throws IOException {
         String w = getAvroSchema("avro/nullable_record.avsc");
-        String data = "{\"a\":\"bob\"}";
+        String data = "{\"required\":\"bob\"}";
         GenericRecord record = readRecord(w, data);
-        assertNotNull(record.get("a"));
+        assertNotNull(record.get("required"));
     }
 
     @Test
@@ -92,7 +92,7 @@ class DecoderTests extends DecoderRunner {
 
     @Test
     public void testRecordCanBeNull() throws IOException {
-        String w = getAvroSchema("avro/nullable_record.avsc");
+        String w = getAvroSchema("avro/nullable_record_default.avsc");
         String data = "{}";
         GenericRecord record = readRecord(w, data);
         assertNull(record.get("S"));

@@ -1,12 +1,5 @@
 package io.avro.decoder;
 
-import java.io.EOFException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.ByteBuffer;
-import java.nio.charset.StandardCharsets;
-import java.util.*;
-
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
@@ -23,6 +16,13 @@ import org.apache.avro.io.parsing.Parser;
 import org.apache.avro.io.parsing.Symbol;
 import org.apache.avro.util.Utf8;
 import org.apache.avro.util.internal.JacksonUtils;
+
+import java.io.EOFException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
+import java.util.*;
 
 /**
  * A {@link Decoder} for Avro's JSON data encoding.
@@ -76,10 +76,10 @@ public class JsonOptionalDecoder extends ParsingDecoder implements Parser.Action
      * Reconfigures this JsonDecoder to use the InputStream provided. If the
      * InputStream provided is null, a NullPointerException is thrown. Otherwise,
      * this JsonDecoder will reset its state and then reconfigure its input.
-     * 
+     *
      * @param in The InputStream to read from. Cannot be null.
-     * @throws IOException in case of factory parser error
      * @return this JsonDecoder
+     * @throws IOException in case of factory parser error
      */
     public JsonOptionalDecoder configure(InputStream in) throws IOException {
         if (null == in)
@@ -95,10 +95,10 @@ public class JsonOptionalDecoder extends ParsingDecoder implements Parser.Action
      * Reconfigures this JsonDecoder to use the String provided for input. If the
      * String provided is null, a NullPointerException is thrown. Otherwise, this
      * JsonDecoder will reset its state and then reconfigure its input.
-     * 
+     *
      * @param in The String to read from. Cannot be null.
-     * @throws IOException from json factory
      * @return this JsonDecoder
+     * @throws IOException from json factory
      */
     public JsonOptionalDecoder configure(String in) throws IOException {
         if (null == in)
@@ -400,21 +400,27 @@ public class JsonOptionalDecoder extends ParsingDecoder implements Parser.Action
 
         if (currentToken == JsonToken.VALUE_NULL) {
             label = "null";
-        } else if (a.size() == 2 &&
-                ("null".equals(a.getLabel(0)) || "null".equals(a.getLabel(1)))) {
-            label = ("null".equals(a.getLabel(0)) ? a.getLabel(1) : a.getLabel(0));
         } else if (currentToken == JsonToken.START_OBJECT
+                && !(in instanceof JsonOptionalParser)
                 && in.nextToken() == JsonToken.FIELD_NAME) {
             label = in.getText();
             in.nextToken();
             parser.pushSymbol(Symbol.UNION_END);
+        } else if (a.size() == 2 &&
+                ("null".equals(a.getLabel(0)) || "null".equals(a.getLabel(1)))) {
+            label = ("null".equals(a.getLabel(0)) ? a.getLabel(1) : a.getLabel(0));
         } else {
             throw getErrorTypeMismatch("start-union");
         }
 
         int n = a.findLabel(label);
-        if (n < 0)
-            throw new AvroTypeException("Unknown union branch " + label);
+        if (n < 0) {
+            if (in instanceof JsonOptionalParser) {
+                n = a.findLabel("null".equals(a.getLabel(0)) ? a.getLabel(1) : a.getLabel(0));
+            } else {
+                throw new AvroTypeException("Unknown union branch " + label);
+            }
+        }
 
         parser.pushSymbol(a.getSymbol(n));
         return n;
