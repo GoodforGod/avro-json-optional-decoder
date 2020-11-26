@@ -572,6 +572,7 @@ public class JsonOptionalDecoder extends ParsingDecoder implements Parser.Action
                         return s.getTypes().stream()
                                 .filter(sub -> sub.getType().equals(Schema.Type.RECORD))
                                 .map(sub -> findField(sub, name))
+                                .filter(Objects::nonNull)
                                 .findAny()
                                 .orElse(null);
                     }
