@@ -400,26 +400,21 @@ public class JsonOptionalDecoder extends ParsingDecoder implements Parser.Action
 
         if (currentToken == JsonToken.VALUE_NULL) {
             label = "null";
+        } else if (a.size() == 2 &&
+                ("null".equals(a.getLabel(0)) || "null".equals(a.getLabel(1)))) {
+            label = ("null".equals(a.getLabel(0)) ? a.getLabel(1) : a.getLabel(0));
         } else if (currentToken == JsonToken.START_OBJECT
-                && !(in instanceof JsonOptionalParser)
                 && in.nextToken() == JsonToken.FIELD_NAME) {
             label = in.getText();
             in.nextToken();
             parser.pushSymbol(Symbol.UNION_END);
-        } else if (a.size() == 2 &&
-                ("null".equals(a.getLabel(0)) || "null".equals(a.getLabel(1)))) {
-            label = ("null".equals(a.getLabel(0)) ? a.getLabel(1) : a.getLabel(0));
         } else {
             throw getErrorTypeMismatch("start-union");
         }
 
         int n = a.findLabel(label);
         if (n < 0) {
-            if (in instanceof JsonOptionalParser) {
-                n = a.findLabel("null".equals(a.getLabel(0)) ? a.getLabel(1) : a.getLabel(0));
-            } else {
-                throw new AvroTypeException("Unknown union branch " + label);
-            }
+            throw new AvroTypeException("Unknown union branch " + label);
         }
 
         parser.pushSymbol(a.getSymbol(n));

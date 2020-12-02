@@ -15,7 +15,7 @@ class DecoderTests extends DecoderRunner {
      * @throws Exception if occurred
      */
     @Test
-    public void testReorderFields() throws Exception {
+    void testReorderFields() throws Exception {
         String w = getAvroSchema("avro/reorder.avsc");
         Schema ws = parseSchema(w);
         String data = "{\"a\":[1,2],\"l\":100}{\"l\": 200, \"a\":[1,2]}";
@@ -27,7 +27,7 @@ class DecoderTests extends DecoderRunner {
     }
 
     @Test
-    public void testNullByDefault() throws IOException {
+    void testNullByDefault() throws IOException {
         String w = getAvroSchema("avro/null_by_default.avsc");
         GenericRecord record = readRecord(w, "{\"username\":\"bob\"}");
 
@@ -35,7 +35,7 @@ class DecoderTests extends DecoderRunner {
     }
 
     @Test
-    public void testNullByDefaultAnyPosition() throws IOException {
+    void testNullByDefaultAnyPosition() throws IOException {
         String w = getAvroSchema("avro/null_by_default.avsc");
         GenericRecord record = readRecord(w, "{\"username\":\"bob\"}");
 
@@ -43,7 +43,7 @@ class DecoderTests extends DecoderRunner {
     }
 
     @Test
-    public void testDefaultValuesAreInferred() throws IOException {
+    void testDefaultValuesAreInferred() throws IOException {
         String w = getAvroSchema("avro/default_inferred.avsc");
         GenericRecord record = readRecord(w, "{}");
 
@@ -51,7 +51,7 @@ class DecoderTests extends DecoderRunner {
     }
 
     @Test
-    public void testNestedNullsAreInferred() throws IOException {
+    void testNestedNullsAreInferred() throws IOException {
         String w = getAvroSchema("avro/nullable_nested_inferred.avsc");
         String data = "{\"S\": {\"b\":1}}";
         GenericRecord record = ((GenericRecord) readRecord(w, data).get("S"));
@@ -59,7 +59,7 @@ class DecoderTests extends DecoderRunner {
     }
 
     @Test
-    public void testNestedNullsAreInferredWhenNotPresent() throws IOException {
+    void testNestedNullsAreInferredWhenNotPresent() throws IOException {
         String w = getAvroSchema("avro/nullable_record.avsc");
         String data = "{\"required\":\"bob\"}";
         GenericRecord record = readRecord(w, data);
@@ -67,7 +67,7 @@ class DecoderTests extends DecoderRunner {
     }
 
     @Test
-    public void testNestedNullsAreInferredWhenPresentRequiredField() throws IOException {
+    void testNestedNullsAreInferredWhenPresentRequiredField() throws IOException {
         String w = getAvroSchema("avro/nullable_record.avsc");
         String data = "{\"required\":\"bob\"}";
         GenericRecord record = readRecord(w, data);
@@ -75,7 +75,23 @@ class DecoderTests extends DecoderRunner {
     }
 
     @Test
-    public void testNestedNullsAreInferredIfPresent() throws IOException {
+    void testNestedRecordNullableOnlyNoInner() throws IOException {
+        String w = getAvroSchema("avro/nullable_record_only.avsc");
+        String data = "{\"req1\":\"bob\"}";
+        GenericRecord record = readRecord(w, data);
+        assertNotNull(record.get("req1"));
+    }
+
+    @Test
+    void testNestedRecordNullableOnlyAllFields() throws IOException {
+        String w = getAvroSchema("avro/nullable_record_only.avsc");
+        String data = "{\"req1\":\"bob\", \"inner\":{\"req\":\"1\",\"code\":1}}";
+        GenericRecord record = readRecord(w, data);
+        assertNotNull(record.get("req1"));
+    }
+
+    @Test
+    void testNestedNullsAreInferredIfPresent() throws IOException {
         String w = getAvroSchema("avro/nullable_record.avsc");
         String data = "{\"required\":\"bob\",\"inner\":{\"req\":\"my\"}}";
         GenericRecord record = readRecord(w, data);
@@ -83,7 +99,7 @@ class DecoderTests extends DecoderRunner {
     }
 
     @Test
-    public void testArraysCanBeNull() throws IOException {
+    void testArraysCanBeNull() throws IOException {
         String w = getAvroSchema("avro/nullable_array.avsc");
         String data = "{}";
         GenericRecord record = readRecord(w, data);
@@ -91,7 +107,15 @@ class DecoderTests extends DecoderRunner {
     }
 
     @Test
-    public void testRecordCanBeNull() throws IOException {
+    void testArraysCanBeNullWithDefault() throws IOException {
+        String w = getAvroSchema("avro/nullable_array_default.avsc");
+        String data = "{}";
+        GenericRecord record = readRecord(w, data);
+        assertNull(record.get("A"));
+    }
+
+    @Test
+    void testRecordCanBeNull() throws IOException {
         String w = getAvroSchema("avro/nullable_record_default.avsc");
         String data = "{}";
         GenericRecord record = readRecord(w, data);
@@ -99,9 +123,9 @@ class DecoderTests extends DecoderRunner {
     }
 
     @Test
-    public void testComplex() throws IOException {
+    void testComplex() throws IOException {
         String w = getAvroSchema("avro/nullable_complex.avsc");
-        String data = "{\"data\":[{\"r1\":[],\"r2\":[{\"notfound1\":{\"array\":[\"val1\",\"val2\"]}}]}]}";
+        String data = "{\"data\":[{\"r1\":[{\"sr2\":\"val1\"}],\"r2\":[{\"notfound1\":[\"val1\",\"val2\"]}]}]}";
         GenericRecord record = readRecord(w, data);
         assertNull(record.get("S"));
     }

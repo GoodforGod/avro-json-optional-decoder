@@ -36,24 +36,12 @@
                   "fields": [
                     {
                       "name": "notfound1",
-                      "type": [
-                        "null",
-                        {
-                          "type": "array",
-                          "items": "string"
-                        }
-                      ],
+                      "type": [ "null", { "type": "array", "items": "string" } ],
                       "default": null
                     },
                     {
                       "name": "notfound2",
-                      "type": [
-                        "null",
-                        {
-                          "type": "array",
-                          "items": "string"
-                        }
-                      ],
+                      "type": [ "null", { "type": "array", "items": "string" } ],
                       "default": null
                     }
                   ]
