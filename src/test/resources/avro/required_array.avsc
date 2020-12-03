@@ -7,10 +7,7 @@
       "name": "l"
     },
     {
-      "type": {
-        "type": "array",
-        "items": "int"
-      },
+      "type": { "type": "array", "items": "int" },
       "name": "a"
     }
   ]

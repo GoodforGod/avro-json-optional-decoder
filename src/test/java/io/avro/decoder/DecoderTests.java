@@ -16,7 +16,7 @@ class DecoderTests extends DecoderRunner {
      */
     @Test
     void testReorderFields() throws Exception {
-        String w = getAvroSchema("avro/reorder.avsc");
+        String w = getAvroSchema("avro/required_array.avsc");
         Schema ws = parseSchema(w);
         String data = "{\"a\":[1,2],\"l\":100}{\"l\": 200, \"a\":[1,2]}";
         JsonOptionalDecoder in = new JsonOptionalDecoder(ws, data);
@@ -28,7 +28,7 @@ class DecoderTests extends DecoderRunner {
 
     @Test
     void testNullByDefault() throws IOException {
-        String w = getAvroSchema("avro/null_by_default.avsc");
+        String w = getAvroSchema("avro/nullable_simple_default.avsc");
         GenericRecord record = readRecord(w, "{\"username\":\"bob\"}");
 
         assertEquals("bob", record.get("username").toString());
@@ -36,7 +36,7 @@ class DecoderTests extends DecoderRunner {
 
     @Test
     void testNullByDefaultAnyPosition() throws IOException {
-        String w = getAvroSchema("avro/null_by_default.avsc");
+        String w = getAvroSchema("avro/nullable_simple_default.avsc");
         GenericRecord record = readRecord(w, "{\"username\":\"bob\"}");
 
         assertEquals("bob", record.get("username").toString());
@@ -44,7 +44,7 @@ class DecoderTests extends DecoderRunner {
 
     @Test
     void testDefaultValuesAreInferred() throws IOException {
-        String w = getAvroSchema("avro/default_inferred.avsc");
+        String w = getAvroSchema("avro/required_simple_default.avsc");
         GenericRecord record = readRecord(w, "{}");
 
         assertEquals(7L, record.get("a"));
@@ -60,15 +60,7 @@ class DecoderTests extends DecoderRunner {
 
     @Test
     void testNestedNullsAreInferredWhenNotPresent() throws IOException {
-        String w = getAvroSchema("avro/nullable_record.avsc");
-        String data = "{\"required\":\"bob\"}";
-        GenericRecord record = readRecord(w, data);
-        assertNotNull(record.get("required"));
-    }
-
-    @Test
-    void testNestedNullsAreInferredWhenPresentRequiredField() throws IOException {
-        String w = getAvroSchema("avro/nullable_record.avsc");
+        String w = getAvroSchema("avro/nullable_record_with_simple.avsc");
         String data = "{\"required\":\"bob\"}";
         GenericRecord record = readRecord(w, data);
         assertNotNull(record.get("required"));
@@ -79,7 +71,7 @@ class DecoderTests extends DecoderRunner {
         String w = getAvroSchema("avro/nullable_record_only.avsc");
         String data = "{\"req1\":\"bob\"}";
         GenericRecord record = readRecord(w, data);
-        assertNotNull(record.get("req1"));
+        assertNull(record.get("inner"));
     }
 
     @Test
@@ -87,12 +79,12 @@ class DecoderTests extends DecoderRunner {
         String w = getAvroSchema("avro/nullable_record_only.avsc");
         String data = "{\"req1\":\"bob\", \"inner\":{\"req\":\"1\",\"code\":1}}";
         GenericRecord record = readRecord(w, data);
-        assertNotNull(record.get("req1"));
+        assertNotNull(record.get("inner"));
     }
 
     @Test
     void testNestedNullsAreInferredIfPresent() throws IOException {
-        String w = getAvroSchema("avro/nullable_record.avsc");
+        String w = getAvroSchema("avro/nullable_record_with_simple.avsc");
         String data = "{\"required\":\"bob\",\"inner\":{\"req\":\"my\"}}";
         GenericRecord record = readRecord(w, data);
         assertNotNull(record.get("required"));
@@ -120,6 +112,54 @@ class DecoderTests extends DecoderRunner {
         String data = "{}";
         GenericRecord record = readRecord(w, data);
         assertNull(record.get("S"));
+    }
+
+    @Test
+    void testMapCanBeMapIfNullable() throws IOException {
+        String w = getAvroSchema("avro/nullable_map.avsc");
+        String data = "{\"map\":{\"name\":\"bob\"}}";
+        GenericRecord record = readRecord(w, data);
+        assertNotNull(record.get("map"));
+    }
+
+    @Test
+    void testMapCanBeNull() throws IOException {
+        String w = getAvroSchema("avro/nullable_map.avsc");
+        String data = "{}";
+        GenericRecord record = readRecord(w, data);
+        assertNull(record.get("map"));
+    }
+
+    @Test
+    void testMapRequired() throws IOException {
+        String w = getAvroSchema("avro/required_map.avsc");
+        String data = "{\"map\":{\"name\":\"bob\"}}";
+        GenericRecord record = readRecord(w, data);
+        assertNotNull(record.get("map"));
+    }
+
+    @Test
+    void testEnumCanBeMapIfNullable() throws IOException {
+        String w = getAvroSchema("avro/nullable_enum.avsc");
+        String data = "{\"e\":\"SPADES\"}";
+        GenericRecord record = readRecord(w, data);
+        assertNotNull(record.get("e"));
+    }
+
+    @Test
+    void testEnumCanBeNull() throws IOException {
+        String w = getAvroSchema("avro/nullable_enum.avsc");
+        String data = "{}";
+        GenericRecord record = readRecord(w, data);
+        assertNull(record.get("suit"));
+    }
+
+    @Test
+    void testEnumRequired() throws IOException {
+        String w = getAvroSchema("avro/required_enum.avsc");
+        String data = "{\"e\":\"SPADES\"}";
+        GenericRecord record = readRecord(w, data);
+        assertNotNull(record.get("e"));
     }
 
     @Test

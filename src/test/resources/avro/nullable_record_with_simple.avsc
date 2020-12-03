@@ -7,11 +7,6 @@
       "name": "required"
     },
     {
-      "type": [ "null", "string" ],
-      "name": "opt",
-      "default": null
-    },
-    {
       "name": "inner",
       "type": [
         "null",

@@ -1,0 +1,14 @@
+{
+  "type": "record",
+  "name": "R",
+  "fields": [
+    {
+      "name": "e",
+      "type": {
+        "name": "Suit",
+        "type": "enum",
+        "symbols": [ "SPADES", "HEARTS", "DIAMONDS", "CLUBS" ]
+      }
+    }
+  ]
+}

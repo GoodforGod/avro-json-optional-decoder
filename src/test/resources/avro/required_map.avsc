@@ -1,0 +1,10 @@
+{
+  "type": "record",
+  "name": "R",
+  "fields": [
+    {
+      "name": "map",
+      "type": { "type": "map", "values": "string" }
+    }
+  ]
+}

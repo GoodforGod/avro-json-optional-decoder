@@ -3,10 +3,6 @@
   "name": "R",
   "fields": [
     {
-      "name": "req1",
-      "type": "string"
-    },
-    {
       "name": "inner",
       "type": [
         "null",
