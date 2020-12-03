@@ -4,7 +4,8 @@
   "fields": [
     {
       "type": [ "null", { "type": "array", "items": "long" } ],
-      "name": "A"
+      "name": "A",
+      "default": null
     }
   ]
 }

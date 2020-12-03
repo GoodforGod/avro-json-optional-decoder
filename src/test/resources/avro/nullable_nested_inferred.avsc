@@ -9,10 +9,7 @@
         "name": "S",
         "fields": [
           {
-            "type": [
-              "null",
-              "long"
-            ],
+            "type": [ "null", "long" ],
             "name": "a",
             "default": null
           },

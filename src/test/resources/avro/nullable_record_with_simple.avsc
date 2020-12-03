@@ -1,0 +1,30 @@
+{
+  "type": "record",
+  "name": "R",
+  "fields": [
+    {
+      "type": "string",
+      "name": "required"
+    },
+    {
+      "name": "inner",
+      "type": [
+        "null",
+        {
+          "type": "record",
+          "name": "inner",
+          "fields": [
+            {
+              "name": "req",
+              "type": "string"
+            },
+            {
+              "name": "code",
+              "type": [ "null", "long" ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
