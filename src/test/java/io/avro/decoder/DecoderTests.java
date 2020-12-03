@@ -28,15 +28,31 @@ class DecoderTests extends DecoderRunner {
 
     @Test
     void testNullByDefault() throws IOException {
-        String w = getAvroSchema("avro/nullable_simple_default.avsc");
-        GenericRecord record = readRecord(w, "{\"username\":\"bob\"}");
+        String w = getAvroSchema("avro/nullable_string_default.avsc");
+        GenericRecord record = readRecord(w, "{\"username\":\"bob\",\"name\":\"a\"}");
+
+        assertEquals("bob", record.get("username").toString());
+    }
+
+    @Test
+    void testRequiredBoolean() throws IOException {
+        String w = getAvroSchema("avro/required_boolean.avsc");
+        GenericRecord record = readRecord(w, "{\"b\":true}");
+
+        assertEquals("true", record.get("b").toString());
+    }
+
+    @Test
+    void testNullAnyOrderByDefault() throws IOException {
+        String w = getAvroSchema("avro/nullable_string_any_order.avsc");
+        GenericRecord record = readRecord(w, "{\"username\":\"bob\",\"name\":\"a\"}");
 
         assertEquals("bob", record.get("username").toString());
     }
 
     @Test
     void testNullByDefaultAnyPosition() throws IOException {
-        String w = getAvroSchema("avro/nullable_simple_default.avsc");
+        String w = getAvroSchema("avro/nullable_string_default.avsc");
         GenericRecord record = readRecord(w, "{\"username\":\"bob\"}");
 
         assertEquals("bob", record.get("username").toString());
@@ -44,7 +60,7 @@ class DecoderTests extends DecoderRunner {
 
     @Test
     void testDefaultValuesAreInferred() throws IOException {
-        String w = getAvroSchema("avro/required_simple_default.avsc");
+        String w = getAvroSchema("avro/required_long_default.avsc");
         GenericRecord record = readRecord(w, "{}");
 
         assertEquals(7L, record.get("a"));

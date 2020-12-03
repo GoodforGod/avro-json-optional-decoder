@@ -401,8 +401,10 @@ public class JsonOptionalDecoder extends ParsingDecoder implements Parser.Action
         if (currentToken == JsonToken.VALUE_NULL) {
             label = "null";
         } else if (a.size() == 2 &&
-                ("null".equals(a.getLabel(0)) || "null".equals(a.getLabel(1)))) {
-            label = ("null".equals(a.getLabel(0)) ? a.getLabel(1) : a.getLabel(0));
+                (a.getSymbol(0) == Symbol.NULL || a.getSymbol(1) == Symbol.NULL)) {
+            label = (a.getSymbol(0) == Symbol.NULL)
+                    ? a.getLabel(1)
+                    : a.getLabel(0);
         } else if (currentToken == JsonToken.START_OBJECT
                 && in.nextToken() == JsonToken.FIELD_NAME) {
             label = in.getText();
