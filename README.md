@@ -13,7 +13,7 @@ Avro Decoder with support optional fields in JSON.
 **Gradle**
 ```groovy
 dependencies {
-    compile 'com.github.goodforgod:avro-json-optional-decoder:1.1.4'
+    implementation 'com.github.goodforgod:avro-json-optional-decoder:1.1.5'
 }
 ```
 
@@ -22,7 +22,7 @@ dependencies {
 <dependency>
     <groupId>com.github.goodforgod</groupId>
     <artifactId>avro-json-optional-decoder</artifactId>
-    <version>1.1.4</version>
+    <version>1.1.5</version>
 </dependency>
 ```
 
@@ -34,7 +34,7 @@ Library is compatible with different Apache Avro versions. Please use compatible
 
 | [Apache Avro](https://mvnrepository.com/artifact/org.apache.avro/avro-compiler) Version | [Library](https://mvnrepository.com/artifact/com.github.goodforgod/avro-json-optional-decoder) Version |
 | ---- | ---- |
-| [1.9.2](https://mvnrepository.com/artifact/org.apache.avro/avro-compiler/1.9.2) | [1.1.4](https://mvnrepository.com/artifact/com.github.goodforgod/avro-json-optional-decoder/1.1.4) |
+| [1.9.2](https://mvnrepository.com/artifact/org.apache.avro/avro-compiler/1.9.2) | [1.1.5](https://mvnrepository.com/artifact/com.github.goodforgod/avro-json-optional-decoder/1.1.4) |
 | [1.8.2](https://mvnrepository.com/artifact/org.apache.avro/avro-compiler/1.8.2) | [1.0.1](https://mvnrepository.com/artifact/com.github.goodforgod/avro-json-optional-decoder/1.0.1) |
 
 
@@ -154,27 +154,6 @@ With
 ```java
 Decoder decoder = new JsonOptionalDecoder(SCHEMA, INPUT_STREAM_OR_STRING);
 ```
-
-## Version History
-
-**1.1.4** - Union strange behavior for optional cases fixed.
-
-**1.1.3** - NPE for record field fixed.
-
-**1.1.2** - [Avro 1.9.2](https://mvnrepository.com/artifact/org.apache.avro/avro-compiler/1.9.2) 
-missing *record field* default value AVRO *null* instead of missing field exception.
-
-**1.1.1** - [Avro 1.9.2](https://mvnrepository.com/artifact/org.apache.avro/avro-compiler/1.9.2) 
-missing *simple field* default value AVRO *null* instead of missing field exception.
-
-**1.1.0** - Apache [Avro 1.9.2](https://mvnrepository.com/artifact/org.apache.avro/avro-compiler/1.9.2) 
-support, improved tests.
-
-**1.0.1** - [Avro 1.8.2](https://mvnrepository.com/artifact/org.apache.avro/avro-compiler/1.8.2) 
-missing field default value AVRO *null* instead of missing field exception.
-
-**1.0.0** - Initial version for Apache [Avro 1.8.2](https://mvnrepository.com/artifact/org.apache.avro/avro-compiler/1.8.2), 
-support for Gradle 6.7, etc.
 
 ## License
 

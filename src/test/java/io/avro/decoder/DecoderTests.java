@@ -1,7 +1,6 @@
 package io.avro.decoder;
 
 import java.io.IOException;
-
 import org.apache.avro.Schema;
 import org.apache.avro.generic.GenericRecord;
 import org.junit.jupiter.api.Test;
@@ -9,8 +8,7 @@ import org.junit.jupiter.api.Test;
 class DecoderTests extends DecoderRunner {
 
     /**
-     * Ensure that even if the order of fields in JSON is different from the order
-     * in schema, it works.
+     * Ensure that even if the order of fields in JSON is different from the order in schema, it works.
      * 
      * @throws Exception if occurred
      */
@@ -112,6 +110,38 @@ class DecoderTests extends DecoderRunner {
         String data = "{}";
         GenericRecord record = readRecord(w, data);
         assertNull(record.get("A"));
+    }
+
+    @Test
+    void testArraysRecordCanBeNull() throws IOException {
+        String w = getAvroSchema("avro/nullable_array_records.avsc");
+        String data = "{}";
+        GenericRecord record = readRecord(w, data);
+        assertNull(record.get("A"));
+    }
+
+    @Test
+    void testArraysRecordCanBeEmpty() throws IOException {
+        String w = getAvroSchema("avro/nullable_array_records.avsc");
+        String data = "{\"A\":[]}";
+        GenericRecord record = readRecord(w, data);
+        assertNotNull(record.get("A"));
+    }
+
+    @Test
+    void testArraysRecordArrayFieldCanBeNull() throws IOException {
+        String w = getAvroSchema("avro/nullable_array_records.avsc");
+        String data = "{\"A\":[{\"s\":\"value\"}]}";
+        GenericRecord record = readRecord(w, data);
+        assertNotNull(record.get("A"));
+    }
+
+    @Test
+    void testArraysRecordArrayFieldAllFieldsPresent() throws IOException {
+        String w = getAvroSchema("avro/nullable_array_records.avsc");
+        String data = "{\"A\":[{\"s\":\"value\",\"b\":true}]}";
+        GenericRecord record = readRecord(w, data);
+        assertNotNull(record.get("A"));
     }
 
     @Test

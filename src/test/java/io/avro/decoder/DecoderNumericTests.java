@@ -1,5 +1,7 @@
 package io.avro.decoder;
 
+import java.io.IOException;
+import java.util.stream.Stream;
 import org.apache.avro.Schema;
 import org.apache.avro.generic.GenericDatumReader;
 import org.apache.avro.generic.GenericRecord;
@@ -8,9 +10,6 @@ import org.apache.avro.io.Decoder;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-
-import java.io.IOException;
-import java.util.stream.Stream;
 
 /**
  * @author Anton Kurako (GoodforGod)
