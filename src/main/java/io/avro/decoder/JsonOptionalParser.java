@@ -2,7 +2,6 @@ package io.avro.decoder;
 
 import com.fasterxml.jackson.core.*;
 import com.fasterxml.jackson.core.json.PackageVersion;
-
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.List;

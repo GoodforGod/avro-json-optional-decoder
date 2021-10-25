@@ -4,6 +4,12 @@ import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
 import com.fasterxml.jackson.databind.JsonNode;
+import java.io.EOFException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
+import java.util.*;
 import org.apache.avro.AvroTypeException;
 import org.apache.avro.JsonProperties;
 import org.apache.avro.Schema;
@@ -17,13 +23,6 @@ import org.apache.avro.io.parsing.Symbol;
 import org.apache.avro.util.Utf8;
 import org.apache.avro.util.internal.JacksonUtils;
 
-import java.io.EOFException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.ByteBuffer;
-import java.nio.charset.StandardCharsets;
-import java.util.*;
-
 /**
  * A {@link Decoder} for Avro's JSON data encoding.
  * <p>
@@ -32,8 +31,8 @@ import java.util.*;
  * JsonOptionalDecoder is not thread-safe.
  * <p>
  * Based on {@link org.apache.avro.io.JsonDecoder JsonDecoder} and
- * <a href="https://github.com/zolyfarkas/avro">ExtendedJsonDecoder</a>. Infers
- * default arguments, if they are not present.
+ * <a href="https://github.com/zolyfarkas/avro">ExtendedJsonDecoder</a>. Infers default arguments,
+ * if they are not present.
  * </p>
  **/
 public class JsonOptionalDecoder extends ParsingDecoder implements Parser.ActionHandler {
@@ -73,9 +72,9 @@ public class JsonOptionalDecoder extends ParsingDecoder implements Parser.Action
     }
 
     /**
-     * Reconfigures this JsonDecoder to use the InputStream provided. If the
-     * InputStream provided is null, a NullPointerException is thrown. Otherwise,
-     * this JsonDecoder will reset its state and then reconfigure its input.
+     * Reconfigures this JsonDecoder to use the InputStream provided. If the InputStream provided is
+     * null, a NullPointerException is thrown. Otherwise, this JsonDecoder will reset its state and then
+     * reconfigure its input.
      *
      * @param in The InputStream to read from. Cannot be null.
      * @return this JsonDecoder
@@ -92,9 +91,9 @@ public class JsonOptionalDecoder extends ParsingDecoder implements Parser.Action
     }
 
     /**
-     * Reconfigures this JsonDecoder to use the String provided for input. If the
-     * String provided is null, a NullPointerException is thrown. Otherwise, this
-     * JsonDecoder will reset its state and then reconfigure its input.
+     * Reconfigures this JsonDecoder to use the String provided for input. If the String provided is
+     * null, a NullPointerException is thrown. Otherwise, this JsonDecoder will reset its state and then
+     * reconfigure its input.
      *
      * @param in The String to read from. Cannot be null.
      * @return this JsonDecoder
@@ -558,8 +557,9 @@ public class JsonOptionalDecoder extends ParsingDecoder implements Parser.Action
     }
 
     private static Field findField(Schema schema, String name) {
-        if (schema.getField(name) != null)
+        if (schema.getField(name) != null) {
             return schema.getField(name);
+        }
 
         return schema.getFields().stream()
                 .map(Field::schema)
@@ -567,8 +567,16 @@ public class JsonOptionalDecoder extends ParsingDecoder implements Parser.Action
                 .map(s -> {
                     if (Schema.Type.UNION.equals(s.getType())) {
                         return s.getTypes().stream()
-                                .filter(sub -> sub.getType().equals(Schema.Type.RECORD))
-                                .map(sub -> findField(sub, name))
+                                .map(sub -> {
+                                    if (sub.getType().equals(Schema.Type.RECORD)) {
+                                        return findField(sub, name);
+                                    } else if (sub.getType().equals(Schema.Type.ARRAY)
+                                            && sub.getElementType().getType().equals(Schema.Type.RECORD)) {
+                                        return findField(sub.getElementType(), name);
+                                    } else {
+                                        return null;
+                                    }
+                                })
                                 .filter(Objects::nonNull)
                                 .findAny()
                                 .orElse(null);

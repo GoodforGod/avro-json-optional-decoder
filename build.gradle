@@ -1,79 +1,60 @@
 plugins {
-    id 'jacoco'
-    id 'java-library'
-    id 'maven-publish'
+    id "jacoco"
+    id "java-library"
+    id "maven-publish"
 
-    id 'org.sonarqube' version '3.0'
-    id 'com.diffplug.gradle.spotless' version '4.4.0'
+    id "org.sonarqube" version "3.3"
+    id "com.diffplug.spotless" version "5.14.3"
 }
 
 repositories {
     mavenLocal()
     mavenCentral()
-    jcenter()
 }
 
 group = groupId
 version = artifactVersion
 
-sourceCompatibility = 1.8
-targetCompatibility = 1.8
+sourceCompatibility = JavaVersion.VERSION_1_8
+targetCompatibility = JavaVersion.VERSION_1_8
 
 spotless {
     java {
-        encoding 'UTF-8'
+        encoding("UTF-8")
+        importOrder()
         removeUnusedImports()
-        eclipse().configFile "${projectDir}/config/codestyle.xml"
+        eclipse().configFile("${projectDir}/config/codestyle.xml")
     }
 }
 
 sonarqube {
     properties {
-        property 'sonar.host.url', 'https://sonarcloud.io'
-        property 'sonar.organization', 'goodforgod'
-        property 'sonar.projectKey', 'GoodforGod_avro-json-optional-decoder'
-    }
-}
-
-configurations {
-    all {
-        resolutionStrategy {
-            cacheChangingModulesFor(8000, 'seconds') // refresh cache for snapshots
-        }
+        property "sonar.host.url", "https://sonarcloud.io"
+        property "sonar.organization", "goodforgod"
+        property "sonar.projectKey", "GoodforGod_avro-json-optional-decoder"
     }
 }
 
 dependencies {
-    api 'org.apache.avro:avro-compiler:1.9.2'
+    api "org.apache.avro:avro-compiler:1.9.2"
 
-    testRuntimeOnly 'ch.qos.logback:logback-classic:1.2.3'
-    testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:$jupiterVersion"
-    testImplementation "org.junit.jupiter:junit-jupiter-api:$jupiterVersion"
-    testImplementation "org.junit.jupiter:junit-jupiter-params:$jupiterVersion"
+    testRuntimeOnly "ch.qos.logback:logback-classic:1.2.3"
+    testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:5.8.1"
+    testImplementation "org.junit.jupiter:junit-jupiter-api:5.8.1"
+    testImplementation "org.junit.jupiter:junit-jupiter-params:5.8.1"
 }
 
 test {
     useJUnitPlatform()
     testLogging {
-        events "passed", "skipped", "failed"
-        exceptionFormat "full"
+        events("passed", "skipped", "failed")
+        exceptionFormat("full")
     }
-}
 
-tasks.withType(JavaCompile) {
-    options.encoding = "UTF-8"
-    options.incremental = true
-    options.fork = true
-}
-
-tasks.withType(Test) {
-    reports.html.enabled = false
-    reports.junitXml.enabled = false
-}
-
-java {
-    withJavadocJar()
-    withSourcesJar()
+    reports {
+        html.enabled(false)
+        junitXml.enabled(false)
+    }
 }
 
 publishing {
@@ -82,27 +63,27 @@ publishing {
             from components.java
 
             pom {
-                name = 'Avro Json Decoder'
-                url = 'https://github.com/GoodforGod/avro-json-optional-decoder'
-                description = 'AVRO Decoder with JSON optional field support.'
+                name = "Avro Json Decoder"
+                url = "https://github.com/GoodforGod/avro-json-optional-decoder"
+                description = "AVRO Decoder with JSON optional field support."
 
                 license {
-                    name = 'Apache License 2.0'
-                    url = 'https://github.com/GoodforGod/avro-json-optional-decoder/blob/master/LICENSE'
-                    distribution = 'repo'
+                    name = "Apache License 2.0"
+                    url = "https://github.com/GoodforGod/avro-json-optional-decoder/blob/master/LICENSE"
+                    distribution = "repo"
                 }
 
                 developer {
-                    id = 'GoodforGod'
-                    name = 'Anton Kurako'
-                    email = 'goodforgod.dev@gmail.com'
-                    url = 'https://github.com/GoodforGod'
+                    id = "GoodforGod"
+                    name = "Anton Kurako"
+                    email = "goodforgod.dev@gmail.com"
+                    url = "https://github.com/GoodforGod"
                 }
 
                 scm {
-                    connection = 'scm:git:git://github.com/GoodforGod/avro-json-optional-decoder.git'
-                    developerConnection = 'scm:git:ssh://GoodforGod/avro-json-optional-decoder.git'
-                    url = 'https://github.com/GoodforGod/avro-json-optional-decoder/tree/master'
+                    connection = "scm:git:git://github.com/GoodforGod/avro-json-optional-decoder.git"
+                    developerConnection = "scm:git:ssh://GoodforGod/avro-json-optional-decoder.git"
+                    url = "https://github.com/GoodforGod/avro-json-optional-decoder/tree/master"
                 }
             }
         }
@@ -112,13 +93,24 @@ publishing {
         maven {
             def releasesRepoUrl = "https://oss.sonatype.org/service/local/staging/deploy/maven2"
             def snapshotsRepoUrl = "https://oss.sonatype.org/content/repositories/snapshots/"
-            url = version.endsWith('SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
+            url = version.endsWith("SNAPSHOT") ? snapshotsRepoUrl : releasesRepoUrl
             credentials {
                 username System.getenv("OSS_USERNAME")
                 password System.getenv("OSS_PASSWORD")
             }
         }
     }
+}
+
+java {
+    withJavadocJar()
+    withSourcesJar()
+}
+
+tasks.withType(JavaCompile) {
+    options.encoding("UTF-8")
+    options.incremental(true)
+    options.fork = true
 }
 
 check.dependsOn jacocoTestReport
@@ -129,16 +121,16 @@ jacocoTestReport {
     }
 }
 
-if (project.hasProperty("signing.keyId")) {
-    apply plugin: 'signing'
-    signing {
-        sign publishing.publications.mavenJava
-    }
-}
-
 javadoc {
     options.encoding = "UTF-8"
     if (JavaVersion.current().isJava9Compatible()) {
-        options.addBooleanOption('html5', true)
+        options.addBooleanOption("html5", true)
+    }
+}
+
+if (project.hasProperty("signing.keyId")) {
+    apply plugin: "signing"
+    signing {
+        sign publishing.publications.mavenJava
     }
 }
