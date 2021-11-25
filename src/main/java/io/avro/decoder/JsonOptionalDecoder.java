@@ -557,6 +557,10 @@ public class JsonOptionalDecoder extends ParsingDecoder implements Parser.Action
     }
 
     private static Field findField(Schema schema, String name) {
+        if (!schema.getType().equals(Schema.Type.RECORD)) {
+            return null;
+        }
+
         if (schema.getField(name) != null) {
             return schema.getField(name);
         }
@@ -570,8 +574,7 @@ public class JsonOptionalDecoder extends ParsingDecoder implements Parser.Action
                                 .map(sub -> {
                                     if (sub.getType().equals(Schema.Type.RECORD)) {
                                         return findField(sub, name);
-                                    } else if (sub.getType().equals(Schema.Type.ARRAY)
-                                            && sub.getElementType().getType().equals(Schema.Type.RECORD)) {
+                                    } else if (sub.getType().equals(Schema.Type.ARRAY)) {
                                         return findField(sub.getElementType(), name);
                                     } else {
                                         return null;
