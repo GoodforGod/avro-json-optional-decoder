@@ -13,7 +13,7 @@ Avro Decoder with support optional fields in JSON.
 **Gradle**
 ```groovy
 dependencies {
-    implementation 'com.github.goodforgod:avro-json-optional-decoder:1.1.5'
+    implementation 'com.github.goodforgod:avro-json-optional-decoder:1.1.6'
 }
 ```
 
@@ -22,7 +22,7 @@ dependencies {
 <dependency>
     <groupId>com.github.goodforgod</groupId>
     <artifactId>avro-json-optional-decoder</artifactId>
-    <version>1.1.5</version>
+    <version>1.1.6</version>
 </dependency>
 ```
 
@@ -34,7 +34,7 @@ Library is compatible with different Apache Avro versions. Please use compatible
 
 | [Apache Avro](https://mvnrepository.com/artifact/org.apache.avro/avro-compiler) Version | [Library](https://mvnrepository.com/artifact/com.github.goodforgod/avro-json-optional-decoder) Version |
 | ---- | ---- |
-| [1.9.2](https://mvnrepository.com/artifact/org.apache.avro/avro-compiler/1.9.2) | [1.1.5](https://mvnrepository.com/artifact/com.github.goodforgod/avro-json-optional-decoder/1.1.4) |
+| [1.9.2](https://mvnrepository.com/artifact/org.apache.avro/avro-compiler/1.9.2) | [1.1.6](https://mvnrepository.com/artifact/com.github.goodforgod/avro-json-optional-decoder/1.1.4) |
 | [1.8.2](https://mvnrepository.com/artifact/org.apache.avro/avro-compiler/1.8.2) | [1.0.1](https://mvnrepository.com/artifact/com.github.goodforgod/avro-json-optional-decoder/1.0.1) |
 
 
